@@ -43,16 +43,19 @@ class SubtitlePlayer:
         if not self.playing:
             self.playing = True
             self.play_button.config(text="Pause")
-            self.pause_event.clear()
             self.audio_thread = threading.Thread(target=self.audio_play_thread)
             self.audio_thread.start()
         else:
             self.playing = False
+            self.playback.pause()
             self.play_button.config(text="Resume")
-            self.pause_event.set()
 
     def audio_play_thread(self):
-        self.playback.play()
+        if not self.playback.active:
+            self.playback.play()
+        else:
+            self.playback.resume()
+
         # Get current subtitle information
 
         while self.playback.playing:
