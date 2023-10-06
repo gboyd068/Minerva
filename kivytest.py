@@ -5,6 +5,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.textinput import TextInput
 from kivy.uix.button import Button
 from kivy.clock import Clock
+from kivy.uix.slider import Slider
 from just_playback import Playback
 
 
@@ -19,10 +20,15 @@ class SubtitlePlayerApp(App):
         self.subtitle_text = TextInput(
             font_size=16, readonly=True, multiline=True)
         self.subtitle_text.cursor_blink = True
+        self.slider = Slider(min=0, max=1, value=0, step=0.01)
+        self.slider.bind(value=self.on_slider_value_change)
         self.play_button = Button(text="Play", on_press=self.toggle_play)
+        # make layout
         self.root_layout = BoxLayout(orientation="vertical")
         self.root_layout.add_widget(self.subtitle_text)
         self.root_layout.add_widget(self.play_button)
+        self.root_layout.add_widget(self.slider)
+        # initialize player
         self.initialize_text()
         self.load_last_played_timestamp()
         self.playback.play()
@@ -75,6 +81,12 @@ class SubtitlePlayerApp(App):
             '\n', ' ') for subtitle in self.subtitle_file])
         Clock.schedule_once(lambda dt: self.set_subtitle_text(subtitle_text)
                             )
+
+    def on_slider_value_change(self, instance, value):
+        # Calculate the new audio position based on the slider value
+        new_audio_position = value * self.playback.duration
+        self.playback.seek(new_audio_position)
+        self.current_audio_position = new_audio_position
 
     def update_cursor(self):
         self.subtitle_text.cursor = (0, self.current_subtitle_idx)
