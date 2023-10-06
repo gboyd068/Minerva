@@ -2,7 +2,6 @@ import tkinter as tk
 from tkinter import ttk
 from just_playback import Playback  # Import AudioPlayback from just_playback
 import threading
-import time
 import pysrt
 
 
@@ -36,6 +35,9 @@ class SubtitlePlayer:
         self.audio_thread = None
         self.playing = False
 
+        # Load the last played timestamp
+        self.load_last_played_timestamp()
+
         # Initialize the subtitle text widget with all subtitle text
         self.init_subtitle_text()
 
@@ -53,13 +55,16 @@ class SubtitlePlayer:
     def audio_play_thread(self):
         if not self.playback.active:
             self.playback.play()
+            self.playback.seek(self.current_audio_position)
         else:
             self.playback.resume()
 
         # Get current subtitle information
 
+        # this could be significantly improved by using a binary search or memory but its fine for now
         while self.playback.playing:
             curr_pos = self.playback.curr_pos
+            self.save_last_played_timestamp()
             # use the current time to get the current subtitle
             for idx, subtitle in enumerate(self.subtitle_file):
                 start_time = subtitle.start.to_time()
@@ -104,6 +109,27 @@ class SubtitlePlayer:
         self.subtitle_text_widget.tag_configure(
             "highlight", background="yellow")
 
+    def load_last_played_timestamp(self):
+        try:
+            with open("last_played_timestamp.txt", "r") as file:
+                self.current_audio_position = float(file.read())
+        except FileNotFoundError:
+            self.current_audio_position = 0
+
+    def save_last_played_timestamp(self):
+        try:
+            with open("last_played_timestamp.txt", "w") as file:
+                if isinstance(self.playback.curr_pos, float):
+                    file.write(str(self.playback.curr_pos))
+                else:
+                    file.write(str(0))
+        except FileNotFoundError:
+            pass
+
+    def __del__(self):
+        self.toggle_play()
+        self.root.destroy()
+
 
 if __name__ == "__main__":
     root = tk.Tk()
@@ -113,4 +139,6 @@ if __name__ == "__main__":
     audio_file = "audio.mp3"
 
     player = SubtitlePlayer(root, subtitle_file, audio_file)
+
+    root.protocol("WM_DELETE_WINDOW", player.__del__)
     root.mainloop()
