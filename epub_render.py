@@ -20,6 +20,7 @@ class EPUBReaderApp(App):
         self.text_label = None
         self.scroll_view = None
         self.pages = []
+        self.position_within_chapter = 0  # line number within chapter
         self.page_buffer = 10
 
     def build(self):
@@ -66,8 +67,8 @@ class EPUBReaderApp(App):
 
         # Create a Button layout for navigation
         button_layout = BoxLayout(size_hint=(1, 0.1))
-        prev_button = Button(text="Previous", on_press=self.prev_chapter)
-        next_button = Button(text="Next", on_press=self.next_chapter)
+        prev_button = Button(text="Previous", on_press=self.prev_page)
+        next_button = Button(text="Next", on_press=self.next_page)
         button_layout.add_widget(prev_button)
         button_layout.add_widget(next_button)
 
@@ -84,34 +85,68 @@ class EPUBReaderApp(App):
         print(self.page_buffer)
 
         # Display the first chapter
-        self.display_chapter(self.text_label)
+        self.display_page(self.text_label)
 
         return main_layout
 
-    def display_chapter(self, label):
+    def display_page(self, label):
         if 0 <= self.current_item_index < self.num_book_items:
             item = self.book_items_list[self.current_item_index]
             if item.get_type() == ebooklib.ITEM_DOCUMENT:
-                # Use BeautifulSoup to parse and extract HTML content
-                soup = BeautifulSoup(item.content, "html.parser")
-                chapter_text = soup.get_text()
-                label.text = chapter_text
+                chapter_text = self.get_chapter_text(item)
+                # get lines between self.position_within_chapter and self.position_within_chapter + self.page_buffer
+                page_text = self.get_page_text(chapter_text, self.position_within_chapter,
+                                               self.position_within_chapter + self.page_buffer)
+                label.text = page_text
 
-    def prev_chapter(self, instance):
+    def get_page_text(self, chapter_text, start, end):
+        # get lines between self.position_within_chapter and self.position_within_chapter + self.page_buffer
+        lines = chapter_text.splitlines()
+        if end > len(lines):
+            end = len(lines)
+        page = "\n".join(lines[start:end])
+        return page
+
+    def get_chapter_text(self, item):
+        # Use BeautifulSoup to parse and extract HTML content
+        soup = BeautifulSoup(item.content, "html.parser")
+        chapter_text = soup.get_text()
+        return chapter_text
+
+    def get_chapter_length(self, item):
+        return len(self.get_chapter_text(item).splitlines())
+
+    def prev_page(self, instance):
+        chapter = self.book_items_list[self.current_item_index]
         if self.current_item_index > 0:
-            self.current_item_index -= 1
-            self.display_chapter(self.text_label)
+            if self.position_within_chapter < self.page_buffer:
+                # go to previous chapter
+                self.current_item_index -= 1
+                self.position_within_chapter = self.get_chapter_length(
+                    chapter) - self.page_buffer
+            else:
+                self.position_within_chapter -= self.page_buffer
+            # display page
+            self.display_page(self.text_label)
 
             # Scroll to the bottom of the ScrollView
-            self.scroll_view.scroll_y = 0.0
+            # self.scroll_view.scroll_y = 0.0
 
-    def next_chapter(self, instance):
+    def next_page(self, instance):
+        chapter = self.book_items_list[self.current_item_index]
         if self.current_item_index < self.num_book_items - 1:
-            self.current_item_index += 1
-            self.display_chapter(self.text_label)
+            if self.position_within_chapter + self.page_buffer >= self.get_chapter_length(chapter):
+                # go to next chapter
+                self.current_item_index += 1
+                self.position_within_chapter = 0
+            else:
+                self.position_within_chapter += self.page_buffer
+
+            # display page
+            self.display_page(self.text_label)
 
             # Scroll to the top of the ScrollView
-            self.scroll_view.scroll_y = 1.0
+            # self.scroll_view.scroll_y = 1.0
 
 
 if __name__ == "__main__":
