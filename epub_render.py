@@ -17,13 +17,13 @@ class EPUBReaderApp(App):
         self.current_item_index = 0
         self.book_items_list = []
         self.num_book_items = 0
-        self.chapter_label = None
+        self.text_label = None
         self.scroll_view = None
+        self.pages = []
+        self.page_buffer = 10
 
     def build(self):
         self.load_epub()
-        self.book_items_list = self.generate_book_items_list(self.book)
-        self.num_book_items = len(self.book_items_list)
         return self.create_ui()
 
     def generate_book_items_list(self, book):
@@ -43,7 +43,8 @@ class EPUBReaderApp(App):
 
     def load_epub(self):
         self.book = epub.read_epub(self.epub_file)
-        # use ebooklib to print all of the filenames in the EPUB
+        self.book_items_list = self.generate_book_items_list(self.book)
+        self.num_book_items = len(self.book_items_list)
 
     def create_ui(self):
         # Create the main layout
@@ -53,7 +54,7 @@ class EPUBReaderApp(App):
         self.scroll_view = ScrollView()
 
         # Create a Label to display the chapter content
-        self.chapter_label = Label(
+        self.text_label = Label(
             markup=True,
             size_hint_y=None,
             halign='left',
@@ -61,7 +62,7 @@ class EPUBReaderApp(App):
             padding=(0, 0),  # Adjust padding as needed
             text_size=(Window.width - 200, None),  # Set text_size to wrap text
         )
-        self.chapter_label.bind(texture_size=self.chapter_label.setter('size'))
+        self.text_label.bind(texture_size=self.text_label.setter('size'))
 
         # Create a Button layout for navigation
         button_layout = BoxLayout(size_hint=(1, 0.1))
@@ -72,11 +73,18 @@ class EPUBReaderApp(App):
 
         # Add the Label and Button layouts to the main layout
         main_layout.add_widget(self.scroll_view)
-        self.scroll_view.add_widget(self.chapter_label)
+        self.scroll_view.add_widget(self.text_label)
         main_layout.add_widget(button_layout)
 
+        # Calculate number of lines that can fit in the window
+        font_size = self.text_label.font_size
+        texture_height = self.text_label.texture_size[1]
+        window_height = Window.height - 20  # Subtract padding
+        self.page_buffer = int(window_height / font_size)
+        print(self.page_buffer)
+
         # Display the first chapter
-        self.display_chapter(self.chapter_label)
+        self.display_chapter(self.text_label)
 
         return main_layout
 
@@ -92,7 +100,7 @@ class EPUBReaderApp(App):
     def prev_chapter(self, instance):
         if self.current_item_index > 0:
             self.current_item_index -= 1
-            self.display_chapter(self.chapter_label)
+            self.display_chapter(self.text_label)
 
             # Scroll to the bottom of the ScrollView
             self.scroll_view.scroll_y = 0.0
@@ -100,7 +108,7 @@ class EPUBReaderApp(App):
     def next_chapter(self, instance):
         if self.current_item_index < self.num_book_items - 1:
             self.current_item_index += 1
-            self.display_chapter(self.chapter_label)
+            self.display_chapter(self.text_label)
 
             # Scroll to the top of the ScrollView
             self.scroll_view.scroll_y = 1.0
