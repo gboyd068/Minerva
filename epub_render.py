@@ -22,13 +22,28 @@ class EPUBReaderApp(App):
 
     def build(self):
         self.load_epub()
-        self.book_items_list = list(
-            self.book.get_items_of_type(ebooklib.ITEM_DOCUMENT))
+        self.book_items_list = self.generate_book_items_list(self.book)
         self.num_book_items = len(self.book_items_list)
         return self.create_ui()
 
+    def generate_book_items_list(self, book):
+        ordered_items = [id
+                         for (ii, (id, show)) in enumerate(book.spine)]
+
+        # get ids of all text items
+        text_item_names = []
+        for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
+            text_item_names.append(item.get_name()[5:])
+
+        # remove items from ordered_items that are not in text_item_names
+        ordered_items = [
+            item for item in ordered_items if item in text_item_names]
+
+        return [book.get_item_with_id(item) for item in ordered_items]
+
     def load_epub(self):
         self.book = epub.read_epub(self.epub_file)
+        # use ebooklib to print all of the filenames in the EPUB
 
     def create_ui(self):
         # Create the main layout
