@@ -118,3 +118,4 @@ if __name__ == "__main__":
     audio_file = "audio.mp3"
     player = SubtitlePlayerApp(subtitle_file, audio_file)
     player.run()
+    player.playback.stop()

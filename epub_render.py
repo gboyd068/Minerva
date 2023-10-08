@@ -57,7 +57,7 @@ class EPUBReaderApp(App):
             markup=True,
             size_hint_y=None,
             halign='left',
-            valign='top',
+            valign='top',  # can use valign='bottom' to render text from bottom for going back pages
             padding=(0, 0),  # Adjust padding as needed),
             text_size=(Window.width-20, Window.height-20),
             size=(Window.width, Window.height),
@@ -100,9 +100,10 @@ class EPUBReaderApp(App):
             self.book_items_list[self.current_item_index]))
         if len(cached_lines) > 0:
             if len(cached_lines[-1].words) > 0:
-                if cached_lines[-1].words[-1].text != page_text.split()[-1]:
-                    count -= 1
-                    # need to split paragraph in this case so that there isnt a repeat of text on the next page
+                if len(page_text.split()) > 0:
+                    if cached_lines[-1].words[-1].text != page_text.split()[-1]:
+                        count -= 1
+                # need to split paragraph in this case so that there isnt a repeat of text on the next page
         self.page_buffer = count
 
     def display_page(self, label):
@@ -123,7 +124,7 @@ class EPUBReaderApp(App):
     def get_page_text(self, chapter_text):
         # get lines between self.position_within_chapter and self.position_within_chapter + self.page_buffer
         start = self.position_within_chapter
-        end = self.position_within_chapter+self.page_buffer
+        end = start+self.page_buffer
         lines = chapter_text.splitlines()
         if end > len(lines):
             end = len(lines)
