@@ -60,13 +60,9 @@ class SubtitlePlayerApp(App):
         self.playback.seek(self.current_audio_position)
         self.playback.resume()
 
-        savecount = 0
         while self.playback.playing:
             time.sleep(0.1)
             curr_pos = self.playback.curr_pos
-            savecount = (savecount + 1) % 10
-            if savecount == 0:
-                self.current_audio_position = curr_pos
             self.slider.value = curr_pos / self.playback.duration
             self.save_last_played_timestamp()
             for idx, subtitle in enumerate(self.subtitle_file):
@@ -104,15 +100,13 @@ class SubtitlePlayerApp(App):
     def update_cursor(self):
         self.subtitle_text.cursor = (0, self.current_subtitle_idx)
 
-    def save_last_played_timestamp(self, time=None):
+    def save_last_played_timestamp(self):
         if self.disable_saving:
             return
         try:
             with open("last_played_timestamp.txt", "w") as file:
-                if time is None:
-                    file.write(str(self.playback.curr_pos))
-                else:
-                    file.write(str(time))
+                file.write(str(self.playback.curr_pos))
+
         except FileNotFoundError:
             pass
 
@@ -126,12 +120,11 @@ class SubtitlePlayerApp(App):
             self.current_audio_position = 0
 
     def on_stop(self):
-        print(self.current_audio_position)
-        self.save_last_played_timestamp(self.current_audio_position)
+
+        self.save_last_played_timestamp()
         self.disable_saving = True
         if self.playback.playing:
             self.toggle_play(self.play_button)
-
         self.playback.stop()
 
 
