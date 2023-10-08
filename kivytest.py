@@ -50,6 +50,10 @@ class SubtitlePlayerApp(App):
             self.playback.pause()
             self.play_button.text = "Resume"
 
+    def subtitle_time_to_seconds(self, time):
+        return (time.hour * 3600 + time.minute * 60 +
+                time.second) + time.microsecond / 1000000
+
     def audio_play_thread(self):
         self.playback.seek(self.current_audio_position)
         self.playback.resume()
@@ -63,12 +67,10 @@ class SubtitlePlayerApp(App):
                 start_time = subtitle.start.to_time()
                 end_time = subtitle.end.to_time()
 
-                start_ms = (start_time.hour * 3600 + start_time.minute * 60 +
-                            start_time.second) * 1000 + start_time.microsecond / 1000
-                end_ms = (end_time.hour * 3600 + end_time.minute * 60 +
-                          end_time.second) * 1000 + end_time.microsecond / 1000
+                start_time_s = self.subtitle_time_to_seconds(start_time)
+                end_time_s = self.subtitle_time_to_seconds(end_time)
 
-                if start_ms <= curr_pos * 1000 <= end_ms:
+                if start_time_s <= curr_pos <= end_time_s:
                     if self.current_subtitle_idx == idx:
                         break
                     if self.current_subtitle_idx != idx:

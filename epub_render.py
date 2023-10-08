@@ -1,3 +1,4 @@
+import math
 import ebooklib
 from ebooklib import epub
 from bs4 import BeautifulSoup
@@ -31,14 +32,14 @@ class EPUBReaderApp(App):
         ordered_items = [id
                          for (ii, (id, show)) in enumerate(book.spine)]
 
-        # get ids of all text items
-        text_item_names = []
-        for item in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
-            text_item_names.append(item.get_name()[5:])
+        # # get ids of all text items
+        # text_item_names = []
+        # for item in book.get_items():
+        #     text_item_names.append(item.get_name()[5:])
 
-        # remove items from ordered_items that are not in text_item_names
-        ordered_items = [
-            item for item in ordered_items if item in text_item_names]
+        # # remove items from ordered_items that are not in text_item_names
+        # ordered_items = [
+        #     item for item in ordered_items if item in text_item_names]
 
         return [book.get_item_with_id(item) for item in ordered_items]
 
@@ -51,17 +52,14 @@ class EPUBReaderApp(App):
         # Create the main layout
         main_layout = BoxLayout(orientation="vertical")
 
-        # Create a ScrollView to hold the content
-        self.scroll_view = ScrollView()
-
         # Create a Label to display the chapter content
         self.text_label = Label(
             markup=True,
             size_hint_y=None,
             halign='left',
             valign='top',
-            padding=(0, 0),  # Adjust padding as needed
-            text_size=(Window.width - 200, None),  # Set text_size to wrap text
+            padding=(0, 0),  # Adjust padding as needed),
+            text_size=(Window.width, Window.height-10),
         )
         self.text_label.bind(texture_size=self.text_label.setter('size'))
 
@@ -73,26 +71,39 @@ class EPUBReaderApp(App):
         button_layout.add_widget(next_button)
 
         # Add the Label and Button layouts to the main layout
-        main_layout.add_widget(self.scroll_view)
-        self.scroll_view.add_widget(self.text_label)
+        main_layout.add_widget(self.text_label)
         main_layout.add_widget(button_layout)
-
-        # Calculate number of lines that can fit in the window
-        font_size = self.text_label.font_size
-        texture_height = self.text_label.texture_size[1]
-        window_height = Window.height - 20  # Subtract padding
-        self.page_buffer = int(window_height / font_size)
-        print(self.page_buffer)
 
         # Display the first chapter
         self.display_page(self.text_label)
 
         return main_layout
 
+    def update_page_buffer(self, label):
+        # Calculate number of lines that can fit in the window
+        font_size = self.text_label.font_size
+        max_line_length = self.get_maximum_line_length(label)
+        if max_line_length == 0:
+            self.page_buffer = 10
+            return
+        chapter_text = self.get_chapter_text(
+            self.book_items_list[self.current_item_index])
+
+        self.page_buffer = 20
+
+    def get_maximum_line_length(self, label):
+        label_text_displayed = label._label.label
+        # get maximum line length
+        max_line_length = 0
+        for line in label_text_displayed.splitlines():
+            max_line_length = max(max_line_length, len(line))
+        return max_line_length
+
     def display_page(self, label):
         if 0 <= self.current_item_index < self.num_book_items:
             item = self.book_items_list[self.current_item_index]
             if item.get_type() == ebooklib.ITEM_DOCUMENT:
+                self.update_page_buffer(label)
                 chapter_text = self.get_chapter_text(item)
                 # get lines between self.position_within_chapter and self.position_within_chapter + self.page_buffer
                 page_text = self.get_page_text(chapter_text, self.position_within_chapter,
