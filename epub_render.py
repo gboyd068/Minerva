@@ -59,9 +59,9 @@ class EPUBReaderApp(App):
             halign='left',
             valign='top',
             padding=(0, 0),  # Adjust padding as needed),
-            text_size=(Window.width, Window.height-10),
+            text_size=(Window.width-20, Window.height-20),
+            size=(Window.width, Window.height),
         )
-        self.text_label.bind(texture_size=self.text_label.setter('size'))
 
         # Create a Button layout for navigation
         button_layout = BoxLayout(size_hint=(1, 0.1))
@@ -79,43 +79,56 @@ class EPUBReaderApp(App):
 
         return main_layout
 
-    def update_page_buffer(self, label):
-        # Calculate number of lines that can fit in the window
-        font_size = self.text_label.font_size
-        max_line_length = self.get_maximum_line_length(label)
-        if max_line_length == 0:
-            self.page_buffer = 10
+    def update_page_buffer(self):
+        # Calculate number of real lines that are in the window
+        count = 0
+        # lines that are currently being drawn to text_label
+        cached_lines = self.text_label._label._cached_lines
+        # for line in cached_lines:
+        #     for word in line.words:
+        #         print(word.text)
+        if len(cached_lines) == 0:
+            self.page_buffer = 50
             return
-        chapter_text = self.get_chapter_text(
-            self.book_items_list[self.current_item_index])
-
-        self.page_buffer = 20
-
-    def get_maximum_line_length(self, label):
-        label_text_displayed = label._label.label
-        # get maximum line length
-        max_line_length = 0
-        for line in label_text_displayed.splitlines():
-            max_line_length = max(max_line_length, len(line))
-        return max_line_length
+        for line in cached_lines:
+            if not line.line_wrap:  # if the line is not a wrapping of another line
+                count += 1
+        if cached_lines[-1].line_wrap:
+            count -= 1
+        # deal with situation where the last line is an incomplete line
+        page_text = self.get_page_text(self.get_chapter_text(
+            self.book_items_list[self.current_item_index]))
+        if len(cached_lines) > 0:
+            if len(cached_lines[-1].words) > 0:
+                if cached_lines[-1].words[-1].text != page_text.split()[-1]:
+                    count -= 1
+                    # need to split paragraph in this case so that there isnt a repeat of text on the next page
+        self.page_buffer = count
 
     def display_page(self, label):
         if 0 <= self.current_item_index < self.num_book_items:
             item = self.book_items_list[self.current_item_index]
-            if item.get_type() == ebooklib.ITEM_DOCUMENT:
-                self.update_page_buffer(label)
-                chapter_text = self.get_chapter_text(item)
-                # get lines between self.position_within_chapter and self.position_within_chapter + self.page_buffer
-                page_text = self.get_page_text(chapter_text, self.position_within_chapter,
-                                               self.position_within_chapter + self.page_buffer)
-                label.text = page_text
+            # if item.get_type() == ebooklib.ITEM_DOCUMENT:
+            self.page_buffer = 50  # large number to ensure page is filled
+            chapter_text = self.get_chapter_text(item)
+            # get lines between self.position_within_chapter and self.position_within_chapter + self.page_buffer
+            page_text = self.get_page_text(chapter_text)
+            label.text = page_text
+            label.texture_update()
+            self.update_page_buffer()
+            page_text = self.get_page_text(chapter_text)
+            label.text = page_text
+            label.texture_update()
 
-    def get_page_text(self, chapter_text, start, end):
+    def get_page_text(self, chapter_text):
         # get lines between self.position_within_chapter and self.position_within_chapter + self.page_buffer
+        start = self.position_within_chapter
+        end = self.position_within_chapter+self.page_buffer
         lines = chapter_text.splitlines()
         if end > len(lines):
             end = len(lines)
-        page = "\n".join(lines[start:end])
+        page = "\n".join(
+            lines[start:])
         return page
 
     def get_chapter_text(self, item):
@@ -129,6 +142,7 @@ class EPUBReaderApp(App):
 
     def prev_page(self, instance):
         chapter = self.book_items_list[self.current_item_index]
+        self.update_page_buffer()
         if self.current_item_index > 0:
             if self.position_within_chapter < self.page_buffer:
                 # go to previous chapter
@@ -137,14 +151,12 @@ class EPUBReaderApp(App):
                     chapter) - self.page_buffer
             else:
                 self.position_within_chapter -= self.page_buffer
-            # display page
-            self.display_page(self.text_label)
 
-            # Scroll to the bottom of the ScrollView
-            # self.scroll_view.scroll_y = 0.0
+            self.display_page(self.text_label)
 
     def next_page(self, instance):
         chapter = self.book_items_list[self.current_item_index]
+        self.update_page_buffer()
         if self.current_item_index < self.num_book_items - 1:
             if self.position_within_chapter + self.page_buffer >= self.get_chapter_length(chapter):
                 # go to next chapter
@@ -152,12 +164,7 @@ class EPUBReaderApp(App):
                 self.position_within_chapter = 0
             else:
                 self.position_within_chapter += self.page_buffer
-
-            # display page
             self.display_page(self.text_label)
-
-            # Scroll to the top of the ScrollView
-            # self.scroll_view.scroll_y = 1.0
 
 
 if __name__ == "__main__":
