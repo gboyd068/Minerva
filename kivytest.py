@@ -31,6 +31,8 @@ class SubtitlePlayerApp(App):
         self.root_layout.add_widget(self.slider)
         # initialize player
         self.initialize_text()
+        self.current_audio_position = None
+        self.disable_saving = False
         self.load_last_played_timestamp()
         self.slider.value = self.current_audio_position / self.playback.duration
         self.playback.play()
@@ -58,9 +60,13 @@ class SubtitlePlayerApp(App):
         self.playback.seek(self.current_audio_position)
         self.playback.resume()
 
+        savecount = 0
         while self.playback.playing:
             time.sleep(0.1)
             curr_pos = self.playback.curr_pos
+            savecount = (savecount + 1) % 10
+            if savecount == 0:
+                self.current_audio_position = curr_pos
             self.slider.value = curr_pos / self.playback.duration
             self.save_last_played_timestamp()
             for idx, subtitle in enumerate(self.subtitle_file):
@@ -98,19 +104,35 @@ class SubtitlePlayerApp(App):
     def update_cursor(self):
         self.subtitle_text.cursor = (0, self.current_subtitle_idx)
 
-    def save_last_played_timestamp(self):
+    def save_last_played_timestamp(self, time=None):
+        if self.disable_saving:
+            return
         try:
             with open("last_played_timestamp.txt", "w") as file:
-                file.write(str(self.playback.curr_pos))
+                if time is None:
+                    file.write(str(self.playback.curr_pos))
+                else:
+                    file.write(str(time))
         except FileNotFoundError:
             pass
 
     def load_last_played_timestamp(self):
+        print("loading last played timestamp")
         try:
             with open("last_played_timestamp.txt", "r") as file:
                 self.current_audio_position = float(file.read())
-        except:
+        except Exception as e:
+            print(e)
             self.current_audio_position = 0
+
+    def on_stop(self):
+        print(self.current_audio_position)
+        self.save_last_played_timestamp(self.current_audio_position)
+        self.disable_saving = True
+        if self.playback.playing:
+            self.toggle_play(self.play_button)
+
+        self.playback.stop()
 
 
 if __name__ == "__main__":
@@ -118,4 +140,3 @@ if __name__ == "__main__":
     audio_file = "audio.mp3"
     player = SubtitlePlayerApp(subtitle_file, audio_file)
     player.run()
-    player.playback.stop()
