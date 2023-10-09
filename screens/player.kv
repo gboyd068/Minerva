@@ -4,10 +4,24 @@
     size_hint: None, None
     size: "48dp", "48dp"
     # opacity: 0
+
+
             
 
 <PlayerScreen>:
     name: "player"
+
+    ReaderWindow:
+        text: ''
+        size_hint: 1, 1
+        canvas.before:
+            Color:
+                rgba:1,0,0,0.2
+            Rectangle:
+                pos:self.pos
+                size:self.size
+        
+        
 
     FloatLayout:
         orientation: "vertical"
@@ -69,14 +83,14 @@
             pos_hint: {"left": 1, "bottom": 1}
             text: "+"
             on_release:
-                root.show_audio_toolbar()
+                root.toggle_audio_toolbar()
             
 
         TransparentButton:
             pos_hint: {"right": 1, "top": 1}
             text: "+"
             on_release:
-                root.show_top_toolbar()
+                root.toggle_top_toolbar()
 
         TransparentButton:
             pos_hint: {"right": 1, "bottom": 1}
