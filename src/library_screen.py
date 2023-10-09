@@ -3,7 +3,9 @@ from kivy.uix.button import Button
 
 
 class LibraryEntry(Button):
-    pass
+    def library_entry_selected(self):
+        # add code for loading the selected book
+        self.parent.parent.parent.parent.current = "player"
 
 
 class LibraryScreen(Screen):
