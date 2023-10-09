@@ -1,8 +1,61 @@
-<PlayerScreen>:
-    name: "second"
+#:import Window kivy.core.window.Window
 
-    Button:
-        text: "Go Back"
-        on_release:
-            app.root.current = "main"
-            root.manager.transition.direction = "right"
+
+<PlayerScreen>:
+    name: "player"
+
+    FloatLayout:
+        orientation: "vertical"
+
+        BoxLayout:
+            size_hint_y: None
+            pos_hint: {"right": 1, "top": 1}
+            height: "48dp"
+            padding: "4dp"
+            spacing: "4dp"
+
+            Button:
+                text: "Go Back"
+                on_release:
+                    app.root.current = "library"
+
+            Button:
+                text: "Settings"
+                on_release:
+                    app.open_settings()
+
+        BoxLayout:
+            id: toolbar
+            orientation: "vertical"
+            size_hint_y: None
+            height: "48dp"
+            padding: "4dp"
+            spacing: "4dp"
+            y: -self.height
+
+            Button:
+                text: "Option 1"
+                on_release:
+                    # Add your code here
+
+            Button:
+                text: "Option 2"
+                on_release:
+                    # Add your code here
+
+        BoxLayout:
+            size_hint_y: 0.9
+
+            # Add your code here
+
+            Button:
+                size_hint: None, None
+                size: "48dp", "48dp"
+                pos_hint: {"right": 1, "bottom": 1}
+                text: "+"
+                on_release:
+                    root.show_toolbar()
+
+    
+        
+    

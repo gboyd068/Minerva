@@ -1,6 +1,7 @@
 # library.kv
 
 <LibraryScreen>:
+    name: "library"
     orientation: 'vertical'
     
     Label:
@@ -8,3 +9,11 @@
         size_hint_y: None
         height: '50dp'
         font_size: '24sp'
+    
+    Button:
+        text: 'Go to Player'
+        size_hint_y: None
+        height: '50dp'
+        on_press: app.root.current = 'player'
+
+    
