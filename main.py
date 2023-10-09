@@ -1,14 +1,8 @@
 from kivy.app import App
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
-
-
-class LibraryScreen(Screen):
-    pass
-
-
-class PlayerScreen(Screen):
-    pass
+from src.library_screen import LibraryScreen
+from src.player_screen import PlayerScreen
 
 
 class WindowManager(ScreenManager):
