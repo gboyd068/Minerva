@@ -1,5 +1,10 @@
 #:import Window kivy.core.window.Window
 
+<TransparentButton>
+    size_hint: None, None
+    size: "48dp", "48dp"
+    # opacity: 0
+            
 
 <PlayerScreen>:
     name: "player"
@@ -18,6 +23,7 @@
             Button:
                 text: "Go Back"
                 on_release:
+                    app.root.transition.direction = "right"
                     app.root.current = "library"
 
             Button:
@@ -27,7 +33,7 @@
 
         BoxLayout:
             id: audio_toolbar
-            orientation: "vertical"
+            orientation: "horizontal"
             size_hint_y: None
             height: "48dp"
             padding: "4dp"
@@ -35,30 +41,54 @@
             y: -self.height
 
             Button:
-                text: "Option 1"
+                text: "Slider"
                 on_release:
                     # Add your code here
 
             Button:
-                text: "Option 2"
+                text: "Back"
                 on_release:
                     # Add your code here
 
-        Button:
-            size_hint: None, None
-            size: "48dp", "48dp"
+            Button:
+                text: "Play/Pause"
+                on_release:
+                    # Add your code here
+
+            Button:
+                text: "Forward"
+                on_release:
+                    # Add your code here
+
+            Button:
+                text: "Close"
+                on_release:
+                    # Add your code here
+
+        TransparentButton:
             pos_hint: {"left": 1, "bottom": 1}
             text: "+"
             on_release:
                 root.show_audio_toolbar()
+            
 
-        Button:
-            size_hint: None, None
-            size: "48dp", "48dp"
-            pos_hint: {"left": 1, "top": 1}
+        TransparentButton:
+            pos_hint: {"right": 1, "top": 1}
             text: "+"
             on_release:
                 root.show_top_toolbar()
+
+        TransparentButton:
+            pos_hint: {"right": 1, "bottom": 1}
+            text: "next"
+            on_release:
+                # next page
+
+        TransparentButton:
+            pos_hint: {"left": 1, "top": 1}
+            text: "prev"
+            on_release:
+                # previous page
 
     
         

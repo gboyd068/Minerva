@@ -1,5 +1,6 @@
 from kivy.uix.screenmanager import Screen
 from kivy.animation import Animation
+from kivy.uix.button import Button
 from kivy.core.window import Window
 
 
@@ -19,3 +20,8 @@ class PlayerScreen(Screen):
         else:
             Animation(y=Window.height,
                       duration=0.2).start(self.ids.top_toolbar)
+
+
+class TransparentButton(Button):
+    # button class that is designed to be transparent and disablable depending on the current state
+    pass

@@ -10,7 +10,9 @@
     halign: 'left'
     valign: 'middle'
     text_size: self.width - 20, self.height - 20
-    on_release: self.library_entry_selected()
+    on_release: 
+        app.root.transition.direction = 'left'
+        self.library_entry_selected()
 
     # Add a label for percentage completion
     Label:
