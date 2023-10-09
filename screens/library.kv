@@ -1,9 +1,42 @@
 # library.kv
 
+<LibraryEntry>
+    size_hint_y: None
+    height: '150dp'
+    # background_normal: 'path/to/image.png'
+    # background_down: 'path/to/image_pressed.png'
+    text: 'Title of the audiobook'
+    font_size: '18sp'
+    halign: 'left'
+    valign: 'middle'
+    text_size: self.width - 20, self.height - 20
+    on_press: app.root.current = 'player'
+
+    # Add a label for percentage completion
+    Label:
+        text: '50% complete'
+        size_hint_y: None
+        height: '30dp'
+        font_size: '14sp'
+        halign: 'left'
+        valign: 'middle'
+        text_size: self.width - 20, self.height - 20
+
 <LibraryScreen>:
     name: "library"
     orientation: 'vertical'
     
+
+    ScrollView:
+        GridLayout:
+            cols: 1
+            size_hint_y: None
+            height: self.minimum_height
+            spacing: '10dp'
+                
+            LibraryEntry:
+
+
     Label:
         text: 'Library'
         size_hint_y: None
