@@ -8,8 +8,9 @@
         orientation: "vertical"
 
         BoxLayout:
+            id: top_toolbar
             size_hint_y: None
-            pos_hint: {"right": 1, "top": 1}
+            y: Window.height
             height: "48dp"
             padding: "4dp"
             spacing: "4dp"
@@ -25,7 +26,7 @@
                     app.open_settings()
 
         BoxLayout:
-            id: toolbar
+            id: audio_toolbar
             orientation: "vertical"
             size_hint_y: None
             height: "48dp"
@@ -43,18 +44,21 @@
                 on_release:
                     # Add your code here
 
-        BoxLayout:
-            size_hint_y: 0.9
+        Button:
+            size_hint: None, None
+            size: "48dp", "48dp"
+            pos_hint: {"left": 1, "bottom": 1}
+            text: "+"
+            on_release:
+                root.show_audio_toolbar()
 
-            # Add your code here
-
-            Button:
-                size_hint: None, None
-                size: "48dp", "48dp"
-                pos_hint: {"right": 1, "bottom": 1}
-                text: "+"
-                on_release:
-                    root.show_toolbar()
+        Button:
+            size_hint: None, None
+            size: "48dp", "48dp"
+            pos_hint: {"left": 1, "top": 1}
+            text: "+"
+            on_release:
+                root.show_top_toolbar()
 
     
         
