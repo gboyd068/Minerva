@@ -1,4 +1,5 @@
 import threading
+import time
 import pysrt
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
@@ -7,7 +8,6 @@ from kivy.uix.button import Button
 from kivy.clock import Clock
 from kivy.uix.slider import Slider
 from just_playback import Playback
-import time
 
 
 class SubtitlePlayerApp(App):
@@ -65,6 +65,7 @@ class SubtitlePlayerApp(App):
             curr_pos = self.playback.curr_pos
             self.slider.value = curr_pos / self.playback.duration
             self.save_last_played_timestamp()
+            # convert this to binary search
             for idx, subtitle in enumerate(self.subtitle_file):
                 start_time = subtitle.start.to_time()
                 end_time = subtitle.end.to_time()

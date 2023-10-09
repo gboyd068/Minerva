@@ -1,6 +1,6 @@
 import difflib
-from epub_render import EPUBReaderApp
-from kivytest import SubtitlePlayerApp
+from src.epub_render import EPUBReaderApp
+from src.audio_player import SubtitlePlayerApp
 
 
 def binary_search(arr, x):

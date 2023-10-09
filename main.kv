@@ -1,0 +1,17 @@
+#: include screens/library.kv
+
+WindowManager:
+    LibraryScreen:
+    PlayerScreen:
+
+
+
+
+<PlayerScreen>:
+    name: "second"
+
+    Button:
+        text: "Go Back"
+        on_release:
+            app.root.current = "main"
+            root.manager.transition.direction = "right"
