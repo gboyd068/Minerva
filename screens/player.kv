@@ -10,6 +10,7 @@
 
     ReaderWindow:
         id: reader_window
+        markup: True
         text: 'test tes tes tes ets estevste ste tasf asfsdfhajsdflsadkflnasdjkflasdjf'
         halign: 'left'
         valign: 'top'
@@ -66,10 +67,8 @@
                 on_release:
                     # Add your code here
 
-            Button:
-                text: "Play/Pause"
-                on_release:
-                    # Add your code here
+            MDIconButton:
+                icon: 'play'
 
             Button:
                 text: "Forward"
