@@ -55,4 +55,16 @@ class ReaderWindow(Label):
 
 class TransparentButton(Button):
     # button class that is designed to be transparent and disablable depending on the current state
-    pass
+    my_disabled = BooleanProperty(False)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.default_size = self.size
+
+    def on_my_disabled(self, instance, value):
+        if value:
+            self.size = (0, 0)
+            self.disabled = True
+        else:
+            self.size = self.default_size
+            self.disabled = False
