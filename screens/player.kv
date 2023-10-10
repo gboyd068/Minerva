@@ -3,7 +3,16 @@
 <TransparentButton>
     size_hint: None, None
     size: "48dp", "48dp"
-    # opacity: 0
+    opacity: 0
+    
+
+<BottomToolbarButton>
+    # icon_size: self.parent.height- 2*self.parent.padding[1]
+    # y: (self.parent.height - self.height) / 2  # set y position to halfway down parent widget
+    
+<MyToolbar>
+    is_active: False
+    resize_reader_window: False
 
 <PlayerScreen>:
     name: "player"
@@ -29,54 +38,61 @@
     FloatLayout:
         orientation: "vertical"
 
-        BoxLayout:
+        MyToolbar:
+            # top toolbar
             id: top_toolbar
+            inactive_y: Window.height
+            active_y: Window.height - self.height
             size_hint_y: None
-            y: Window.height
+            y: self.inactive_y
             height: "48dp"
             padding: "4dp"
-            spacing: "4dp"
+            spacing: 0.875 * Window.width
 
-            Button:
-                text: "Go Back"
+            MDIconButton:
+                icon: "keyboard-backspace"
+                pos_hint: {"left": 0}
                 on_release:
                     app.root.transition.direction = "right"
                     app.root.current = "library"
 
-            Button:
-                text: "Settings"
+            MDIconButton:
+                icon: "dots-vertical"
+                pos_hint: {"right": 1}
                 on_release:
                     app.open_settings()
 
-        BoxLayout:
+        MyToolbar:
+            # audio toolbar
             id: audio_toolbar
+            inactive_y: -self.height
+            active_y: 0
+            resize_reader_window: True
             orientation: "horizontal"
             size_hint_y: None
             height: "48dp"
             padding: "4dp"
             spacing: "4dp"
-            y: -self.height
+            y: self.inactive_y
 
-            Button:
-                text: "Slider"
+            BottomToolbarButton:
+                icon: "triangle-small-up"
                 on_release:
                     # Add your code here
 
-            Button:
-                text: "Back"
+            BottomToolbarButton:
+                icon: "step-backward"
                 on_release:
                     # Add your code here
 
-            MDIconButton:
+            BottomToolbarButton:
                 icon: 'play'
 
-            Button:
-                text: "Forward"
-                on_release:
-                    # Add your code here
+            BottomToolbarButton:
+                icon: 'step-forward'
 
-            Button:
-                text: "Close"
+            BottomToolbarButton:
+                icon: "triangle-small-down"
                 on_release:
                     # Add your code here
 
@@ -84,14 +100,14 @@
             pos_hint: {"left": 1, "bottom": 1}
             text: "+"
             on_release:
-                root.toggle_audio_toolbar()
+                root.ids.audio_toolbar.toggle_toolbar()
 
 
         TransparentButton:
             pos_hint: {"right": 1, "top": 1}
             text: "+"
             on_release:
-                root.toggle_top_toolbar()
+                root.ids.top_toolbar.toggle_toolbar()
 
         TransparentButton:
             pos_hint: {"right": 1, "bottom": 1}
