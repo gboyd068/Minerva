@@ -100,15 +100,19 @@
         TransparentButton:
             pos_hint: {"left": 1, "bottom": 1}
             text: "+"
+            on_touch_down:
+                self.disabled = root.ids.audio_toolbar.is_active
             on_release:
                 root.ids.audio_toolbar.toggle_toolbar()
-                self.disabled = root.ids.audio_toolbar.is_active
+
                 
 
 
         TransparentButton:
             pos_hint: {"right": 1, "top": 1}
             text: "+"
+            on_touch_down:
+                self.disabled = root.ids.top_toolbar.is_active
             on_release:
                 root.ids.top_toolbar.toggle_toolbar()
 
