@@ -5,23 +5,25 @@
     size: "48dp", "48dp"
     # opacity: 0
 
-
-            
-
 <PlayerScreen>:
     name: "player"
 
     ReaderWindow:
-        text: ''
-        size_hint: 1, 1
+        id: reader_window
+        text: 'test tes tes tes ets estevste ste tasf asfsdfhajsdflsadkflnasdjkflasdjf'
+        halign: 'left'
+        valign: 'top'
+        size_hint: None, None
+        pos_hint: {'left': 1, 'top': 1}
+        size: Window.width, Window.height
+        text_size: self.size
+        padding: 40, 40 # make this into a setting
         canvas.before:
             Color:
                 rgba:1,0,0,0.2
             Rectangle:
                 pos:self.pos
                 size:self.size
-        
-        
 
     FloatLayout:
         orientation: "vertical"
@@ -84,7 +86,7 @@
             text: "+"
             on_release:
                 root.toggle_audio_toolbar()
-            
+
 
         TransparentButton:
             pos_hint: {"right": 1, "top": 1}
@@ -103,7 +105,3 @@
             text: "prev"
             on_release:
                 # previous page
-
-    
-        
-    
