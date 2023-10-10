@@ -2,11 +2,13 @@
 
 <TransparentButton>
     size_hint: None, None
-    size: "48dp", "48dp"
-    opacity: 0
+    default_size_x: "48dp"
+    default_size_y: "48dp"  
+    size: (self.default_size_x, self.default_size_y)
+    opacity: 0.5
     
 
-<BottomToolbarButton>
+<AudioToolbarButton>
     # icon_size: self.parent.height- 2*self.parent.padding[1]
     # y: (self.parent.height - self.height) / 2  # set y position to halfway down parent widget
     
@@ -76,32 +78,31 @@
             spacing: "4dp"
             y: self.inactive_y
 
-            BottomToolbarButton:
+            AudioToolbarButton:
                 icon: "triangle-small-up"
                 on_release:
                     # Add your code here
 
-            BottomToolbarButton:
+            AudioToolbarButton:
                 icon: "step-backward"
                 on_release:
                     # Add your code here
 
-            BottomToolbarButton:
+            AudioToolbarButton:
                 icon: 'play'
 
-            BottomToolbarButton:
+            AudioToolbarButton:
                 icon: 'step-forward'
 
-            BottomToolbarButton:
+            AudioToolbarButton:
                 icon: "triangle-small-down"
                 on_release:
                     # Add your code here
 
         TransparentButton:
+            id: audio_toolbar_show_button
             pos_hint: {"left": 1, "bottom": 1}
             text: "+"
-            on_touch_down:
-                self.my_disabled = root.ids.audio_toolbar.is_active
             on_release:
                 root.ids.audio_toolbar.toggle_toolbar()
 
@@ -109,20 +110,21 @@
 
 
         TransparentButton:
+            id: top_toolbar_show_button
             pos_hint: {"right": 1, "top": 1}
             text: "+"
-            on_touch_down:
-                self.disabled = root.ids.top_toolbar.is_active
             on_release:
                 root.ids.top_toolbar.toggle_toolbar()
 
         TransparentButton:
+            id: next_button
             pos_hint: {"right": 1, "bottom": 1}
             text: "next"
             on_release:
                 # next page
 
         TransparentButton:
+            id: prev_button
             pos_hint: {"left": 1, "top": 1}
             text: "prev"
             on_release:
