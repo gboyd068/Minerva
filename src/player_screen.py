@@ -20,13 +20,14 @@ class MyToolbar(BoxLayout):
         self.resize_reader_window = BooleanProperty(False)
         self.inactive_y = NumericProperty(0)
         self.active_y = NumericProperty(0)
+        self.duration = NumericProperty(0.2)
 
     def toggle_toolbar(self):
         if self.is_active:
             Animation(y=self.inactive_y,
-                      duration=0.2).start(self)
+                      duration=self.duration).start(self)
         else:
-            Animation(y=self.active_y, duration=0.2).start(
+            Animation(y=self.active_y, duration=self.duration).start(
                 self)
         self.is_active = not self.is_active
 
@@ -34,10 +35,10 @@ class MyToolbar(BoxLayout):
         if self.resize_reader_window:
             if self.is_active:
                 Animation(size=(Window.width, Window.height - self.height),
-                          duration=0.2).start(self.parent.parent.ids.reader_window)
+                          duration=self.duration).start(self.parent.parent.ids.reader_window)
             else:
                 Animation(size=(Window.width, Window.height),
-                          duration=0.2).start(self.parent.parent.ids.reader_window)
+                          duration=self.duration).start(self.parent.parent.ids.reader_window)
 
 
 class BottomToolbarButton(MDIconButton):

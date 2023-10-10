@@ -13,6 +13,7 @@
 <MyToolbar>
     is_active: False
     resize_reader_window: False
+    duration: 0.2
 
 <PlayerScreen>:
     name: "player"
@@ -101,6 +102,8 @@
             text: "+"
             on_release:
                 root.ids.audio_toolbar.toggle_toolbar()
+                self.disabled = root.ids.audio_toolbar.is_active
+                
 
 
         TransparentButton:
