@@ -5,6 +5,11 @@ from kivy.uix.settings import SettingsWithSidebar
 
 from src.library_screen import LibraryScreen
 from src.player_screen import PlayerScreen
+from kivy.config import Config
+
+Config.set('graphics', 'width', '400')
+Config.set('graphics', 'height', '700')
+Config.write()
 
 
 class WindowManager(ScreenManager):
