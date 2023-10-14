@@ -62,6 +62,11 @@ class AudioToolbarButton(MDIconButton):
 
 
 class ReaderWindow(MDLabel):
+
+    def on_size(self, *args):
+        self.display_page()
+
+        
     def on_touch_down(self, touch):
         # logic for clicking on the reader window
         top_toolbar = self.parent.ids.top_toolbar
@@ -130,6 +135,7 @@ class ReaderWindow(MDLabel):
         self.page_buffer = count
 
     def display_page(self):
+        print("displaying page")
         if 0 <= self.current_item_index < self.num_book_items:
             item = self.book_items_list[self.current_item_index]
             # if item.get_type() == ebooklib.ITEM_DOCUMENT:
