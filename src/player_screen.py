@@ -48,13 +48,15 @@ class MyToolbar(BoxLayout):
         self.is_active = not self.is_active
 
         # if the toolbar is meant to resize the reader window, do so
+        reader_window = self.parent.parent.ids.reader_window
         if self.resize_reader_window:
             if self.is_active:
                 Animation(size=(Window.width, Window.height - self.height),
-                          duration=self.duration).start(self.parent.parent.ids.reader_window)
+                          duration=self.duration).start(reader_window)
             else:
                 Animation(size=(Window.width, Window.height),
-                          duration=self.duration).start(self.parent.parent.ids.reader_window)
+                          duration=self.duration).start(reader_window)
+            reader_window.display_page()
 
 
 class AudioToolbarButton(MDIconButton):
@@ -64,7 +66,8 @@ class AudioToolbarButton(MDIconButton):
 class ReaderWindow(MDLabel):
 
     def on_size(self, *args):
-        self.display_page()
+        pass
+        # self.display_page()
 
         
     def on_touch_down(self, touch):
@@ -135,7 +138,6 @@ class ReaderWindow(MDLabel):
         self.page_buffer = count
 
     def display_page(self):
-        print("displaying page")
         if 0 <= self.current_item_index < self.num_book_items:
             item = self.book_items_list[self.current_item_index]
             # if item.get_type() == ebooklib.ITEM_DOCUMENT:
