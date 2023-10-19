@@ -42,64 +42,64 @@ class ReaderWindow(MDLabel):
         self.num_book_items = len(self.book_items_list)
 
     def update_page_buffer(self, page_text, prev=False):
-        if not prev:
-            # Calculate number of real lines that are in the window
-            count = 0
-            # lines that are currently being drawn to text_label
-            cached_lines = self._label._cached_lines
-            # for line in cached_lines:
-            #     for word in line.words:
-            #         print(word.text)
-            if len(cached_lines) == 0:
-                self.page_buffer = 50
-                return
-            for line in cached_lines:
-                if not line.line_wrap:  # if the line is not a wrapping of another line
-                    count += 1
-            # deal with situation where the last line is part of an incomplete paragraph
-            # page_text = self.get_page_text(self.get_chapter_text(
-                # self.book_items_list[self.current_item_index]))
-            if len(cached_lines) > 0:
-                if len(cached_lines[-1].words) > 0:
-                    if len(page_text.split()) > 0:
-                        final_word = cached_lines[-1].words[-1].text.split()[-1]
-                        if  final_word != page_text.split()[-1]:
-                            count -= 1
-                            paragraphs = page_text.split("\n")
-                            final_line = cached_lines[-1].words[-1].text
-                            # get position of last line in last paragraph
-                            last_line_pos = paragraphs[count].rfind(final_line)
-                            if last_line_pos >= 0:
-                                self.end_page_paragraph_pos = last_line_pos + len(final_line) + 1
-                            else:
-                                self.end_page_paragraph_pos = 0
-            self.page_buffer = count
+        # Calculate number of real lines that are in the window
+        forward_count = 0
+        # lines that are currently being drawn to text_label
+        cached_lines = self._label._cached_lines
+        # for line in cached_lines:
+        #     for word in line.words:
+        #         print(word.text)
+        if len(cached_lines) == 0:
+            self.page_buffer = 50
+            return
+        for line in cached_lines:
+            if not line.line_wrap:  # if the line is not a wrapping of another line
+                forward_count += 1
+        # deal with situation where the last line is part of an incomplete paragraph
+        # page_text = self.get_page_text(self.get_chapter_text(
+            # self.book_items_list[self.current_item_index]))
+        if len(cached_lines) > 0:
+            if len(cached_lines[-1].words) > 0:
+                if len(page_text.split()) > 0:
+                    final_word = cached_lines[-1].words[-1].text.split()[-1]
+                    if  final_word != page_text.split()[-1]:
+                        forward_count -= 1
+                        paragraphs = page_text.split("\n")
+                        final_line = cached_lines[-1].words[-1].text
+                        # get position of last line in last paragraph
+                        last_line_pos = paragraphs[forward_count].rfind(final_line)
+                        if last_line_pos >= 0:
+                            self.end_page_paragraph_pos = last_line_pos + len(final_line) + 1
+                        else:
+                            self.end_page_paragraph_pos = 0
         
         # if going back a page we need to calculate it the other way around
-        if prev:
-            # Calculate number of paragraphs that are started in the window
-            count = 0
-            # lines that are currently being drawn to text_label
-            cached_lines = self._label._cached_lines
-            for line in cached_lines[::-1]:
-                if not line.line_wrap:  # if the line is not a wrapping of another line
-                    count += 1
+        # Calculate number of paragraphs that are started in the window
+        backward_count = 0
+        for line in cached_lines[::-1]:
+            if not line.line_wrap:  # if the line is not a wrapping of another line
+                backward_count += 1
 
-            if len(cached_lines) > 0:
-                if len(cached_lines[0].words) > 0:
-                    if len(page_text.split()) > 0:
-                        first_word = cached_lines[0].words[0].text.split()[0]
-                        if  first_word != page_text.split()[0]:
-                            count += 1
-                            paragraphs = page_text.split("\n")
-                            first_line = cached_lines[0].words[0].text
-                            # get position of first line in first paragraph
-                            first_line_pos = paragraphs[-count].rfind(first_line)
-                            if first_line_pos >= 0:
-                                self.start_page_paragraph_pos = first_line_pos
-                            else:
-                                self.start_page_paragraph_pos = 0
-            self.page_buffer = count
+        if len(cached_lines) > 0:
+            if len(cached_lines[0].words) > 0:
+                if len(page_text.split()) > 0:
+                    first_word = cached_lines[0].words[0].text.split()[0]
+                    if  first_word != page_text.split()[0]:
+                        backward_count += 1
+                        paragraphs = page_text.split("\n")
+                        first_line = cached_lines[0].words[0].text
+                        # get position of first line in first paragraph
+                        first_line_pos = paragraphs[-backward_count].rfind(first_line)
+                        if first_line_pos >= 0:
+                            self.start_page_paragraph_pos = first_line_pos
+                        else:
+                            self.start_page_paragraph_pos = 0
+        if not prev:
+            self.page_buffer = forward_count
+        else:
+            self.page_buffer = backward_count
+        print(self.start_page_paragraph_pos)
+        print(self.end_page_paragraph_pos)
 
 
     def display_page(self, prev=False):
@@ -148,6 +148,9 @@ class ReaderWindow(MDLabel):
 
         page = "\n".join(
             paragraphs[start:end])
+        if len(page) > 0:
+            if page[0] == "\n":
+                page = page[1:]
         return page
 
     def get_chapter_text(self, item):
