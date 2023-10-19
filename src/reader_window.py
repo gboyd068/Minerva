@@ -95,7 +95,6 @@ class ReaderWindow(MDLabel):
                             first_line = cached_lines[0].words[0].text
                             # get position of first line in first paragraph
                             first_line_pos = paragraphs[-count].rfind(first_line)
-                            print(first_line_pos)
                             if first_line_pos >= 0:
                                 self.start_page_paragraph_pos = first_line_pos
                             else:
@@ -107,8 +106,8 @@ class ReaderWindow(MDLabel):
         self.page_buffer = 50  # large number to ensure page is filled
         if prev:
             self.valign = "bottom"
-            start = self.paragraph_within_chapter - self.page_buffer
-            end = self.paragraph_within_chapter
+            start = self.paragraph_within_chapter - self.page_buffer + 1
+            end = self.paragraph_within_chapter + 1
         else:
             self.valign = "top"
             start = self.paragraph_within_chapter
@@ -122,11 +121,11 @@ class ReaderWindow(MDLabel):
             self.text = page_text
             self.texture_update()
             self.update_page_buffer(page_text, prev)
-            if prev:
-                self.valign = "bottom"
-                start = self.paragraph_within_chapter - self.page_buffer
-                end = self.paragraph_within_chapter
-                page_text = self.get_page_text(chapter_text, start, end, prev)
+            # if prev:
+            #     self.valign = "bottom"
+            #     start = self.paragraph_within_chapter - self.page_buffer
+            #     end = self.paragraph_within_chapter
+            #     page_text = self.get_page_text(chapter_text, start, end, prev)
             self.text = page_text
             self.texture_update()
 
@@ -145,7 +144,7 @@ class ReaderWindow(MDLabel):
             paragraphs[start] = paragraphs[start][self.start_page_paragraph_pos:]
 
         if prev and 0 < len(paragraphs) and len(paragraphs) > end:
-            paragraphs[end] = paragraphs[end][:self.end_page_paragraph_pos]
+            paragraphs[end-1] = paragraphs[end-1][:self.end_page_paragraph_pos]
 
         page = "\n".join(
             paragraphs[start:end])
