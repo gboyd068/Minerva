@@ -1,5 +1,6 @@
 from kivy.uix.screenmanager import Screen
 from kivy.uix.button import Button
+from kivy.app import App
 
 
 class LibraryEntry(Button):
