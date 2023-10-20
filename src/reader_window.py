@@ -196,7 +196,7 @@ class ReaderWindow(MDLabel):
             paragraphs[start:end])
         
         # page = page.strip("\n")
-        return page.strip("\n")
+        return page
 
     def get_chapter_text(self, item):
         # Use BeautifulSoup to parse and extract HTML content
@@ -215,6 +215,7 @@ class ReaderWindow(MDLabel):
             if self.paragraph_within_chapter == 0:
                 # go to previous chapter
                 self.current_item_index -= 1
+                chapter = self.book_items_list[self.current_item_index]
                 self.paragraph_within_chapter = self.get_chapter_length(chapter) - 1
             
             print("------------\nparagraph within chapter", self.paragraph_within_chapter)
