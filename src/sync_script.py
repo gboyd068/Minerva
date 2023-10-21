@@ -42,6 +42,16 @@ def bookpos_from_time(book_time_dict, chapter_starts, paragraph_starts, time):
     bookpos = get_chapter_paragraph_position(book_index, chapter_starts, paragraph_starts)
     return bookpos
 
+def get_total_time(audio_file_start_times, audio_file_index, time):
+    """takes the current audio file index and the time in that file and returns the total time elapsed"""
+    total_time = audio_file_start_times[audio_file_index] + time
+    return total_time
+
+def get_audio_file_index_and_file_time(audio_file_start_times, time):
+    """takes the time elapsed and returns the audio file index"""
+    audio_file_index = binary_search(audio_file_start_times, time, True)
+    file_time = time - audio_file_start_times[audio_file_index]
+    return audio_file_index, file_time
 
 epub_file_path = "alloy/alloy.epub"  # Replace with the path to your EPUB file
 epubapp = EPUBReaderApp(epub_file_path)
@@ -101,15 +111,15 @@ for i, file in enumerate(subtitle_files):
 
         if match.size > 0:
             # Start index of the best match
-            start_index = match.a
+            start_index = match.a 
             # End index of the best match
             end_index = match.a + match.size
 
             # print("Start index:", start_index)
             # print("End index:", end_index)
             # print("Best match:", booktext[start_index:end_index])
-            book_time_dict[start_index] = player.subtitle_time_to_seconds(
-                s.start.to_time()) + audio_file_start_times[i]
+            book_time_dict[start_index] = get_total_time(audio_file_start_times, i, player.subtitle_time_to_seconds(
+                s.start.to_time()))
         else:
             print("No match found.")
 
@@ -118,7 +128,7 @@ for i, file in enumerate(subtitle_files):
         assert is_strictly_increasing
 
 
-def get_chapter_paragraph_position(book_index, chapter_starts, paragraph_starts,):
+def get_chapter_paragraph_position(book_index, chapter_starts, paragraph_starts):
     """takes a book index as number of characters through the book and returns 
     (chapter_idx, paragraph_idx, characters_through_paragraph)"""
     # if book_index is negative
