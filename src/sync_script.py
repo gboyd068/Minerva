@@ -1,6 +1,9 @@
 import difflib
 from epub_render import EPUBReaderApp
 from audio_player import SubtitlePlayerApp
+import os
+import glob
+import pysrt
 
 def binary_search(arr, x, return_idx=False):
     left, right = 0, len(arr) - 1
@@ -70,29 +73,49 @@ for chapter in chapter_texts:
 
 start_index = 0
 book_time_dict = {}
-for s in player.subtitle_file:
+print("syncing audio and ebooks")
+# get lengths of all audio files
+audio_files = glob.glob("alloy/audio/*")
+audio_file_start_times = []
+time_elapsed = 0
+for file in audio_files:
+    print(file)
+    audio_file_start_times.append(time_elapsed)
+    player = SubtitlePlayerApp(subtitle_file, file)
+    time_elapsed += player.playback.duration
 
-    text = s.text.replace('\n', ' ')
-    # Create a SequenceMatcher object
-    matcher = difflib.SequenceMatcher(None, booktext, text)
+print(audio_file_start_times)
 
-    # Find the best matching substring within the larger text
-    match = matcher.find_longest_match(start_index, min(
-        start_index+2000, len(booktext)), 0, len(text))
+subtitle_files = glob.glob("alloy/subs/*")
+for i, file in enumerate(subtitle_files):
+    print(file)
+    subtitles = pysrt.open(file)
+    for s in subtitles:
+        text = s.text.replace('\n', ' ')
+        # Create a SequenceMatcher object
+        matcher = difflib.SequenceMatcher(None, booktext, text)
 
-    if match.size > 0:
-        # Start index of the best match
-        start_index = match.a
-        # End index of the best match
-        end_index = match.a + match.size
+        # Find the best matching substring within the larger text
+        match = matcher.find_longest_match(start_index, min(
+            start_index+200, len(booktext)), 0, len(text))
 
-        # print("Start index:", start_index)
-        # print("End index:", end_index)
-        # print("Best match:", booktext[start_index:end_index])
-        book_time_dict[start_index] = player.subtitle_time_to_seconds(
-            s.start.to_time())
-    else:
-        print("No match found.")
+        if match.size > 0:
+            # Start index of the best match
+            start_index = match.a
+            # End index of the best match
+            end_index = match.a + match.size
+
+            # print("Start index:", start_index)
+            # print("End index:", end_index)
+            # print("Best match:", booktext[start_index:end_index])
+            book_time_dict[start_index] = player.subtitle_time_to_seconds(
+                s.start.to_time()) + audio_file_start_times[i]
+        else:
+            print("No match found.")
+
+        book_index_list = list(book_time_dict.keys())
+        is_strictly_increasing = all(i < j for i, j in zip(book_index_list, book_index_list[1:]))
+        assert is_strictly_increasing
 
 
 def get_chapter_paragraph_position(book_index, chapter_starts, paragraph_starts,):
