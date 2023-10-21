@@ -18,19 +18,26 @@ def binary_search(arr, x, return_idx=False):
             right = mid - 1
 
     if return_idx:
+        if result is None:
+            return 0
         return arr.index(result) # this is dumb but I couldn't be bothered
+    if result is None:
+        return arr[0]
     return result
 
+def time_from_bookpos(book_time_dict, chapter_starts, paragraph_starts, bookpos):
+    book_index = get_book_index(*bookpos, chapter_starts, paragraph_starts)
+    book_index_list = list(book_time_dict.keys())
+    nearest_book_index = binary_search(book_index_list, book_index)
+    return book_time_dict[nearest_book_index]
 
-def time_from_bookpos(book_time_dict, bookpos):
-    nearest_bookpos = binary_search(list(book_time_dict.keys()), bookpos)
-    return book_time_dict[nearest_bookpos]
 
-
-def bookpos_from_time(book_time_dict, time):
+def bookpos_from_time(book_time_dict, chapter_starts, paragraph_starts, time):
     nearest_time = binary_search(list(book_time_dict.values()), time)
     index = list(book_time_dict.values()).index(nearest_time)
-    return list(book_time_dict.keys())[index]
+    book_index = list(book_time_dict.keys())[index]
+    bookpos = get_chapter_paragraph_position(book_index, chapter_starts, paragraph_starts)
+    return bookpos
 
 
 epub_file_path = "alloy/alloy.epub"  # Replace with the path to your EPUB file
@@ -88,7 +95,7 @@ for s in player.subtitle_file:
         print("No match found.")
 
 
-def get_chapter_paragraph_position(book_index):
+def get_chapter_paragraph_position(book_index, chapter_starts, paragraph_starts,):
     """takes a book index as number of characters through the book and returns 
     (chapter_idx, paragraph_idx, characters_through_paragraph)"""
     # if book_index is negative
@@ -102,3 +109,10 @@ def get_chapter_paragraph_position(book_index):
     if book_index > paragraph_starts[-1][-1]:
         characters_through_paragraph = 0
     return chapter_idx, paragraph_idx, characters_through_paragraph
+
+
+def get_book_index(chapter_idx, paragraph_idx, characters_through_paragraph, chapter_starts, paragraph_starts):
+    """takes a chapter index, paragraph index, and characters through paragraph and returns 
+    the book index as number of characters through the book"""
+    book_index = paragraph_starts[chapter_idx][paragraph_idx] + characters_through_paragraph
+    return book_index
