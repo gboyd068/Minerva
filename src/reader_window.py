@@ -196,7 +196,7 @@ class ReaderWindow(MDLabel):
         page = "\n".join(
             paragraphs[start:end])
         
-        # page = page.strip("\n")
+        # page = page.replace("\n", "\n\n") # I dont like this solution
         return page
 
     def get_chapter_text(self, item):

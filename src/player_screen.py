@@ -7,6 +7,9 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import BooleanProperty, NumericProperty
 
 from src.reader_window import ReaderWindow
+from src.audio_player import AudioPlayer
+from scr.sync_script import SyncScript
+# create a syncing script class that is initialised by feeding in the audio player and the reader window
 
 class PlayerScreen(Screen):
     def disable_buttons(self):

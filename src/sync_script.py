@@ -4,6 +4,7 @@ from audio_player import SubtitlePlayerApp
 import os
 import glob
 import pysrt
+from just_playback import Playback
 
 def binary_search(arr, x, return_idx=False):
     left, right = 0, len(arr) - 1
@@ -28,15 +29,17 @@ def binary_search(arr, x, return_idx=False):
         return arr[0]
     return result
 
-def time_from_bookpos(book_time_dict, chapter_starts, paragraph_starts, bookpos):
+def total_time_from_bookpos(book_time_dict, chapter_starts, paragraph_starts, bookpos):
+    """takes in a book position as (chapter_idx, paragraph_idx, characters_through_paragraph) and returns the total time"""
     book_index = get_book_index(*bookpos, chapter_starts, paragraph_starts)
     book_index_list = list(book_time_dict.keys())
     nearest_book_index = binary_search(book_index_list, book_index)
     return book_time_dict[nearest_book_index]
 
 
-def bookpos_from_time(book_time_dict, chapter_starts, paragraph_starts, time):
-    nearest_time = binary_search(list(book_time_dict.values()), time)
+def bookpos_from_total_time(book_time_dict, chapter_starts, paragraph_starts, total_time):
+    """takes in a total time and returns a book position as (chapter_idx, paragraph_idx, characters_through_paragraph)"""
+    nearest_time = binary_search(list(book_time_dict.values()), total_time)
     index = list(book_time_dict.values()).index(nearest_time)
     book_index = list(book_time_dict.keys())[index]
     bookpos = get_chapter_paragraph_position(book_index, chapter_starts, paragraph_starts)
@@ -47,11 +50,25 @@ def get_total_time(audio_file_start_times, audio_file_index, time):
     total_time = audio_file_start_times[audio_file_index] + time
     return total_time
 
-def get_audio_file_index_and_file_time(audio_file_start_times, time):
-    """takes the time elapsed and returns the audio file index"""
-    audio_file_index = binary_search(audio_file_start_times, time, True)
-    file_time = time - audio_file_start_times[audio_file_index]
+def get_audio_file_index_and_file_time(audio_file_start_times, total_time):
+    """takes the total time elapsed and returns the audio file index"""
+    audio_file_index = binary_search(audio_file_start_times, total_time, True)
+    file_time = total_time - audio_file_start_times[audio_file_index]
     return audio_file_index, file_time
+
+
+def file_time_from_bookpos(book_time_dict, chapter_starts, paragraph_starts, audio_file_start_times, bookpos):
+    """takes in a book position as (chapter_idx, paragraph_idx, characters_through_paragraph) and returns audio file and file time"""
+    total_time = total_time_from_bookpos(book_time_dict, chapter_starts, paragraph_starts, bookpos)
+    audio_file_index, file_time = get_audio_file_index_and_file_time(audio_file_start_times, total_time)
+    return audio_file_index, file_time
+
+def bookpos_from_file_time(book_time_dict, chapter_starts, paragraph_starts, audio_file_start_times, audio_file_index, file_time):
+    """takes in an audio file index and file time and returns a book position as (chapter_idx, paragraph_idx, characters_through_paragraph)"""
+    total_time = get_total_time(audio_file_start_times, audio_file_index, file_time)
+    bookpos = bookpos_from_total_time(book_time_dict, chapter_starts, paragraph_starts, total_time)
+    return bookpos
+
 
 epub_file_path = "alloy/alloy.epub"  # Replace with the path to your EPUB file
 epubapp = EPUBReaderApp(epub_file_path)
@@ -91,8 +108,8 @@ time_elapsed = 0
 for file in audio_files:
     print(file)
     audio_file_start_times.append(time_elapsed)
-    player = SubtitlePlayerApp(subtitle_file, file)
-    time_elapsed += player.playback.duration
+    playback = Playback(file)
+    time_elapsed += playback.duration
 
 print(audio_file_start_times)
 
