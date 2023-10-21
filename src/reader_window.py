@@ -5,7 +5,8 @@ from kivy.core.window import Window
 
 class ReaderWindow(MDLabel):
     def on_size(self, *args):
-        self.update_my_max_lines()
+        pass
+        # self.update_my_max_lines()
         # self.display_page()
 
     def update_my_max_lines(self):
@@ -66,7 +67,7 @@ class ReaderWindow(MDLabel):
         # position within paragraph at the start
         start_paragraph_idx = 0
         if len(cached_lines) > 0:
-            if len(cached_lines[0].words) > 0:
+            if len(cached_lines[0].words) > 0: # TODO need to modify this so it looks at the first non-empty line
                 if len(page_text.split()) > 0:
                     if len(cached_lines[0].words[0].text.split()) > 0:
                         first_word = cached_lines[0].words[0].text.split()[0]
@@ -88,7 +89,7 @@ class ReaderWindow(MDLabel):
         if len(cached_lines) > 0:
             if len(cached_lines[-1].words) > 0:
                 if len(page_text.split()) > 0:
-                    print("getting end paragraph idx")
+                    # print("getting end paragraph idx")
                     final_word = cached_lines[-1].words[-1].text.split()[-1]
                     final_line = cached_lines[-1].words[-1].text
                     # find the paragraph which contains the final line
@@ -108,7 +109,7 @@ class ReaderWindow(MDLabel):
                         end_paragraph_complete = True
                         self.end_page_paragraph_pos = 0
         
-        print("num_cached_lines", len(cached_lines))
+        # print("num_cached_lines", len(cached_lines))
         if len(cached_lines) < self.my_max_lines:
             # page not full, go back / forward a chapter by setting the page buffer to a large number
             end_paragraph_idx = 50
@@ -124,11 +125,11 @@ class ReaderWindow(MDLabel):
         if prev:
             end_paragraph_idx = len(paragraphs) - 1
 
-        print("start_paragraph_idx", start_paragraph_idx)
-        print("end_paragraph_idx", end_paragraph_idx)
-        print("start_paragraph_complete", start_paragraph_complete)
-        print("end_paragraph_complete", end_paragraph_complete)
-        print("forward_count", backward_count)
+        # print("start_paragraph_idx", start_paragraph_idx)
+        # print("end_paragraph_idx", end_paragraph_idx)
+        # print("start_paragraph_complete", start_paragraph_complete)
+        # print("end_paragraph_complete", end_paragraph_complete)
+        # print("forward_count", backward_count)
         if not prev:
             self.page_buffer = end_paragraph_idx - start_paragraph_idx
             # if going forward and final paragraph complete then increase page buffer
@@ -139,7 +140,7 @@ class ReaderWindow(MDLabel):
             # if the first paragraph is complete then increase page buffer
             if start_paragraph_complete:
                 self.page_buffer += 1
-        print("page buffer", self.page_buffer)
+        # print("page buffer", self.page_buffer)
 
         if start_paragraph_idx == 0 and end_paragraph_idx == 0:
             self.page_buffer = 50
@@ -218,7 +219,7 @@ class ReaderWindow(MDLabel):
                 chapter = self.book_items_list[self.current_item_index]
                 self.paragraph_within_chapter = self.get_chapter_length(chapter) - 1
             
-            print("------------\nparagraph within chapter", self.paragraph_within_chapter)
+            # print("------------\nparagraph within chapter", self.paragraph_within_chapter)
             self.display_page(prev=True)
             self.paragraph_within_chapter -= self.page_buffer
             if self.paragraph_within_chapter < 0:

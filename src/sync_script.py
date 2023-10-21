@@ -1,12 +1,11 @@
 import difflib
-from src.epub_render import EPUBReaderApp
-from src.audio_player import SubtitlePlayerApp
+from epub_render import EPUBReaderApp
+from audio_player import SubtitlePlayerApp
 
-
-def binary_search(arr, x):
+def binary_search(arr, x, return_idx=False):
     left, right = 0, len(arr) - 1
     result = None  # Initialize result to None
-
+ 
     while left <= right:
         mid = left + (right - left) // 2
 
@@ -18,6 +17,8 @@ def binary_search(arr, x):
             # If the current element is greater than x, search in the left half
             right = mid - 1
 
+    if return_idx:
+        return arr.index(result) # this is dumb but I couldn't be bothered
     return result
 
 
@@ -32,21 +33,33 @@ def bookpos_from_time(book_time_dict, time):
     return list(book_time_dict.keys())[index]
 
 
-epub_file_path = "alloy.epub"  # Replace with the path to your EPUB file
+epub_file_path = "alloy/alloy.epub"  # Replace with the path to your EPUB file
 epubapp = EPUBReaderApp(epub_file_path)
 epubapp.run()
 
-subtitle_file = "subtitle.srt"
-audio_file = "audio.mp3"
+subtitle_file = "alloy/subs/alloy1.srt"
+audio_file = "alloy/audio/alloy1.mp3"
 player = SubtitlePlayerApp(subtitle_file, audio_file)
 player.run()
 
-
+# BE CAREFUL THIS IS USING THE OLD BOOK READER CODE WHICH DOES NOT STRIP NEWLINES AT CHAPTER START/END
+chapter_texts = [epubapp.get_chapter_text(chapter) for chapter in epubapp.book_items_list]
+# create booktext as a single string with no newlines
 booktext = ""
-for item in epubapp.book_items_list:
-    booktext += epubapp.get_chapter_text(item)
-# remove newlines in booktext
-booktext = booktext.replace('\n', ' ')
+chapter_starts = []
+paragraph_starts = []
+current_idx = 0
+for chapter in chapter_texts:
+    chapter_starts.append(current_idx)
+    # get paragraph starts
+    p_starts = []
+    for paragraph in chapter.splitlines():
+        p_starts.append(current_idx)
+        booktext += paragraph + " "
+        current_idx += len(paragraph) + 1
+    paragraph_starts.append(p_starts)
+
+
 
 start_index = 0
 book_time_dict = {}
@@ -75,5 +88,17 @@ for s in player.subtitle_file:
         print("No match found.")
 
 
-print(time_from_bookpos(book_time_dict, 58000))
-print(bookpos_from_time(book_time_dict, 200))
+def get_chapter_paragraph_position(book_index):
+    """takes a book index as number of characters through the book and returns 
+    (chapter_idx, paragraph_idx, characters_through_paragraph)"""
+    # if book_index is negative
+    if book_index < 0:
+        return 0, 0, 0
+    
+    chapter_idx = binary_search(chapter_starts, book_index, True) 
+    paragraph_idx = binary_search(paragraph_starts[chapter_idx], book_index, True)
+    characters_through_paragraph = book_index - paragraph_starts[chapter_idx][paragraph_idx]
+    # if book_index is past the last paragraph
+    if book_index > paragraph_starts[-1][-1]:
+        characters_through_paragraph = 0
+    return chapter_idx, paragraph_idx, characters_through_paragraph

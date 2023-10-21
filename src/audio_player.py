@@ -94,7 +94,7 @@ class SubtitlePlayerApp(App):
     def on_slider_value_change(self, instance, value):
         # Calculate the new audio position based on the slider value
         new_audio_position = value * self.playback.duration
-        if new_audio_position - self.current_audio_position > 1:
+        if abs(new_audio_position - self.current_audio_position) > 1:
             self.playback.seek(new_audio_position)
         self.current_audio_position = new_audio_position
 
@@ -130,7 +130,7 @@ class SubtitlePlayerApp(App):
 
 
 if __name__ == "__main__":
-    subtitle_file = "subtitle.srt"
-    audio_file = "audio.mp3"
+    subtitle_file = "alloy/subs/alloy1.srt"
+    audio_file = "alloy/audio/alloy1.mp3"
     player = SubtitlePlayerApp(subtitle_file, audio_file)
     player.run()
