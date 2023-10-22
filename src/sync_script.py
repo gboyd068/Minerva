@@ -20,12 +20,6 @@ class SyncScript():
         self.chapter_starts = []
         self.paragraph_starts = []
         self.audio_file_start_times = []
-        Clock.schedule_once(self._finish_init)
-    
-    def _finish_init(self, dt):
-        # get a reference for the slider so sync script can update it
-        app = MDApp.get_running_app()
-        print(app.root.ids.player_screen.ids.audio_slider) # kind of hacky
     
 
     def load_sync_data(self):

@@ -80,13 +80,12 @@ class MyToolbar(BoxLayout):
 class AudioToolbarButton(MDIconButton):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.sync_script = None
+        self.audio_player = None
         Clock.schedule_once(self._finish_init)
 
     def _finish_init(self, dt):
         app = MDApp.get_running_app()
-        # maybe I want this to be the sync script instead...
-        self.sync_script = app.root.ids.player_screen.sync_script
+        self.audio_player = app.root.ids.player_screen.audio_player
         
 
 class TransparentButton(Button):

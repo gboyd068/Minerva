@@ -32,6 +32,14 @@ class MyMainApp(MDApp):
     def on_config_change(self, config, section, key, value):
         pass
 
+    # FROM OLD AUDIOAPP CLASS NEEDS TO BE MODIFIED
+    # def on_stop(self):
+    #     self.save_last_played_timestamp()
+    #     self.disable_saving = True
+    #     if self.playback.playing:
+    #         self.toggle_play(self.play_button)
+    #     self.playback.stop()
+
 
 if __name__ == "__main__":
     MyMainApp().run()
