@@ -23,6 +23,18 @@ class SyncScript():
         self.paragraph_starts = []
         self.audio_file_start_times = []
     
+    def sync_to_audio_position(self):
+        audio_file_idx = self.audio_player.current_audio_idx
+        audio_position = self.audio_player.current_audio_position
+        bookpos = self.bookpos_from_file_time(audio_file_idx, audio_position)
+        print(bookpos)
+        self.reader_window.current_item_index = bookpos[0]
+        self.reader_window.paragraph_within_chapter = bookpos[1]
+        self.reader_window.start_page_paragraph_pos = 0
+        self.reader_window.display_page()
+
+    def sync_to_text_position(self):
+        pass
 
     def load_sync_data(self):
         try:
@@ -96,15 +108,16 @@ class SyncScript():
 
                 # Find the best matching substring within the larger text
                 match = matcher.find_longest_match(start_index, min(
-                    start_index+200, len(booktext)), 0, len(text))
+                    start_index+600, len(booktext)), 0, len(text))
 
                 if match.size > 0:
                     # Start index of the best match
                     start_index = match.a 
                     # End index of the best match
-                    # end_index = match.a + match.size
+                    end_index = match.a + match.size
                     book_time_dict[start_index] = self.get_total_time(i, self.audio_player.subtitle_time_to_seconds(
                         s.start.to_time()))
+
                 else:
                     print("No match found.")
 
@@ -116,6 +129,7 @@ class SyncScript():
 
         with open(os.path.join(self.book_path, "sync_data.json"), 'w+') as f:
             json.dump(sync_data, f)
+        self._finish_load_book(sync_data)
         dialog.dismiss()
 
 
@@ -138,11 +152,16 @@ class SyncScript():
             dialog.open()
             Clock.schedule_once(lambda dt: self._generate_sync_data(dialog))
         else:
-            self.book_time_dict = sync_data["book_time_dict"]
-            self.chapter_starts = sync_data["chapter_starts"]
-            self.paragraph_starts = sync_data["paragraph_starts"]
-            self.audio_file_start_times = sync_data["audio_file_start_times"]
-        
+            self._finish_load_book(sync_data)
+
+
+    def _finish_load_book(self, sync_data):
+        # convert dict to right formats
+        self.book_time_dict = sync_data["book_time_dict"]
+        self.chapter_starts = sync_data["chapter_starts"]
+        self.paragraph_starts = sync_data["paragraph_starts"]
+        self.audio_file_start_times = sync_data["audio_file_start_times"]
+        self.book_time_dict = {int(k):v for k,v in self.book_time_dict.items()}
         # go to the correct saved position in the book/audiobook
         self.audio_player.load_last_played_timestamp()
 

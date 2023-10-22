@@ -11,6 +11,11 @@
 <AudioToolbarButton>
     icon_size: 0.6 * self.parent.height
     # y: (self.parent.height - self.height) / 2  # set y position to halfway down parent widget
+
+<PlayButton@AudioToolbarButton>:
+    is_playing: False  # Note! This creates a new BooleanProperty
+    icon: "pause" if self.is_playing else "play"
+    on_release: self.is_playing = not self.is_playing
     
 <MyToolbar>
     is_active: False
@@ -126,7 +131,7 @@
                 AudioToolbarButton:
                     icon: "skip-backward"
                     on_release:
-                        # Add your code here
+                        root.audio_player.go_to_previous_audio_file()
 
                 MDSlider:
                     id: audio_slider
@@ -142,7 +147,7 @@
                 AudioToolbarButton:
                     icon: "skip-forward"
                     on_release:
-                        # Add your code here
+                        root.audio_player.go_to_next_audio_file()
 
             BoxLayout:
                 # bottom layer
@@ -159,9 +164,10 @@
                     on_release:
                         # Add your code here
 
-                AudioToolbarButton:
+                PlayButton:
                     id: play_button
-                    icon: 'play'
+                    on_press:
+                        root.audio_player.toggle_play()
 
                 AudioToolbarButton:
                     icon: 'step-forward'
