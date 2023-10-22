@@ -118,7 +118,7 @@ class SyncScript():
         # if its a valid path then load it
         self.book_path = book_path
         # load ebook
-        self.reader_window.load_book(  glob.glob(os.path.join(self.book_path, "*.epub"))[0] )
+        self.reader_window.load_epub(  glob.glob(os.path.join(self.book_path, "*.epub"))[0] )
         # load audiobook
 
     

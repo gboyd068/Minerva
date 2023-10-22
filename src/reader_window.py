@@ -26,7 +26,7 @@ class ReaderWindow(MDLabel):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.epub_file = "src/alloy.epub"
+        self.epub_file = None
         self.book = None
         self.current_item_index = 0
         self.book_items_list = []
@@ -37,9 +37,10 @@ class ReaderWindow(MDLabel):
         self.start_page_paragraph_pos = 0
         self.end_page_paragraph_pos = 0
         self.page_buffer = 10
-        self.my_max_lines = 35 # needs to be set properly
-        self.load_epub(self.epub_file)
-        self.display_page()
+        self.my_max_lines = 0
+        self.update_my_max_lines()
+        # self.load_epub(self.epub_file)
+        # self.display_page()
 
     def generate_book_items_list(self, book):
         ordered_items = [id
@@ -51,6 +52,7 @@ class ReaderWindow(MDLabel):
         self.book = epub.read_epub(epub_file)
         self.book_items_list = self.generate_book_items_list(self.book)
         self.num_book_items = len(self.book_items_list)
+        self.display_page()
 
     def update_page_buffer(self, page_text, prev=False):
         # lines that are currently being drawn to text_label
