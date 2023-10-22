@@ -8,7 +8,9 @@ import pysrt
 from just_playback import Playback
 from kivy.clock import Clock
 from kivymd.app import MDApp
-
+from kivymd.uix.dialog import MDDialog
+from kivy.core.window import Window
+from threading import Thread
 
 class SyncScript():
     def __init__(self, audio_player, reader_window):
@@ -70,7 +72,7 @@ class SyncScript():
 
 
 
-    def _generate_sync_data(self):
+    def _generate_sync_data(self, dialog):
         sync_data = {}
         # get chapter and paragraph starts
         booktext, self.chapter_starts, self.paragraph_starts = self._index_ebook()
@@ -112,8 +114,10 @@ class SyncScript():
 
         sync_data["book_time_dict"] = book_time_dict
 
-        with open(os.path.join(self.book_path, "sync_data.json")) as f:
+        with open(os.path.join(self.book_path, "sync_data.json"), 'w+') as f:
             json.dump(sync_data, f)
+        dialog.dismiss()
+
 
 
 
@@ -129,8 +133,10 @@ class SyncScript():
         sync_data = self.load_sync_data()
         # sync if not already synced
         if not sync_data:
-            # TODO make a popup that says syncing
-            self._generate_sync_data()
+            # make a popup
+            dialog = MDDialog(text="Syncing...")
+            dialog.open()
+            Clock.schedule_once(lambda dt: self._generate_sync_data(dialog))
         else:
             self.book_time_dict = sync_data["book_time_dict"]
             self.chapter_starts = sync_data["chapter_starts"]

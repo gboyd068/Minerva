@@ -18,6 +18,7 @@ class AudioPlayer():
         self.playing = False
         self.audio_thread = None
         self.slider = None
+        self.sync_script = None
         # self.slider.value = self.current_audio_position / self.playback.duration
         Clock.schedule_once(self._finish_init)
     
@@ -26,6 +27,7 @@ class AudioPlayer():
         app = MDApp.get_running_app()
         self.slider = app.root.ids.player_screen.ids.audio_slider # kind of hacky
         self.slider.bind(value=self.on_slider_value_change)
+        self.sync_script = app.root.ids.player_screen.sync_script
 
     def load_audio_path(self, audio_path):
         self.audio_filenames = glob.glob(os.path.join(audio_path, "*.mp3"))
@@ -41,9 +43,15 @@ class AudioPlayer():
         if  0 <= audio_file_idx < len(self.audio_filenames):
             self.current_audio_idx = audio_file_idx
             self.load_audio_file(self.current_audio_idx)
-            self.playback.seek(audio_position)
+            if 0 <= audio_position < self.playback.duration:
+                self.playback.seek(audio_position)
+                self.current_audio_position = audio_position
+
+                # TELL SYNCSCRIPT HERE
+
             if self.playing:
                 self.playback.resume()
+            
     
     def go_to_next_audio_file(self):
         self.go_to_audio_file_position(self.current_audio_idx + 1, 0)
@@ -97,8 +105,8 @@ class AudioPlayer():
         # Calculate the new audio position based on the slider value
         new_audio_position = value * self.playback.duration
         if abs(new_audio_position - self.current_audio_position) > 1:
-            self.playback.seek(new_audio_position)
-        self.current_audio_position = new_audio_position
+            self.go_to_audio_file_position(self.current_audio_idx, new_audio_position)
+        
 
     def save_last_played_timestamp(self):
         if self.disable_saving:
