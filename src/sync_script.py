@@ -6,17 +6,26 @@ import glob
 import json
 import pysrt
 from just_playback import Playback
+from kivy.clock import Clock
+from kivymd.app import MDApp
 
 
 class SyncScript():
     def __init__(self, audio_player, reader_window):
         self.audio_player = audio_player
         self.reader_window = reader_window
+        self.slider = None
         self.book_path = None # potentially load book that was last used in app
         self.book_time_dict = {}
         self.chapter_starts = []
         self.paragraph_starts = []
         self.audio_file_start_times = []
+        Clock.schedule_once(self._finish_init)
+    
+    def _finish_init(self, dt):
+        # get a reference for the slider so sync script can update it
+        app = MDApp.get_running_app()
+        print(app.root.ids.player_screen.ids.audio_slider) # kind of hacky
     
 
     def load_sync_data(self):
@@ -33,7 +42,7 @@ class SyncScript():
         return sync_data
 
 
-    def index_ebook(self):
+    def _index_ebook(self):
         """generates lists of the starts of chapters and paragraphs in the book in terms of characters through the book"""
         chapter_texts = [self.reader_window.get_chapter_text(chapter) for chapter in self.reader_window.book_items_list]
         # create booktext as a single string with no newlines
@@ -53,7 +62,7 @@ class SyncScript():
         return booktext, chapter_starts, paragraph_starts
     
 
-    def index_audiobook(self):
+    def _index_audiobook(self):
         # get lengths of all audio files
         audio_files = glob.glob(os.path.join(self.book_path, "audio", "*.mp3"))
         audio_file_start_times = []
@@ -67,14 +76,14 @@ class SyncScript():
 
 
 
-    def generate_sync_data(self):
+    def _generate_sync_data(self):
         sync_data = {}
         # get chapter and paragraph starts
-        booktext, self.chapter_starts, self.paragraph_starts = self.index_ebook()
+        booktext, self.chapter_starts, self.paragraph_starts = self._index_ebook()
         sync_data["chapter_starts"] = self.chapter_starts
         sync_data["paragraph_starts"] = self.paragraph_starts
         # get audio file start times
-        self.audio_file_start_times = self.index_audiobook()
+        self.audio_file_start_times = self._index_audiobook()
         sync_data["audio_file_start_times"] = self.audio_file_start_times
 
         # get book time dict
@@ -120,13 +129,14 @@ class SyncScript():
         # load ebook
         self.reader_window.load_epub(  glob.glob(os.path.join(self.book_path, "*.epub"))[0] )
         # load audiobook
-
+        self.audio_player.audio_path = os.path.join(self.book_path, "audio")
+        self.audio_player.load_audio_path(self.audio_player.audio_path)
     
         sync_data = self.load_sync_data()
         # sync if not already synced
         if not sync_data:
             # TODO make a popup that says syncing
-            self.generate_sync_data()
+            self._generate_sync_data()
         else:
             self.book_time_dict = sync_data["book_time_dict"]
             self.chapter_starts = sync_data["chapter_starts"]
@@ -134,7 +144,7 @@ class SyncScript():
             self.audio_file_start_times = sync_data["audio_file_start_times"]
         
         # go to the correct saved position in the book/audiobook
-        
+        self.audio_player.load_last_played_timestamp()
 
 
     def binary_search(self, arr, x, return_idx=False):
@@ -221,83 +231,3 @@ class SyncScript():
         the book index as number of characters through the book"""
         book_index = self.paragraph_starts[chapter_idx][paragraph_idx] + characters_through_paragraph
         return book_index
-
-
-
-
-
-# epub_file_path = "alloy/alloy.epub"  # Replace with the path to your EPUB file
-# epubapp = EPUBReaderApp(epub_file_path)
-# epubapp.run()
-
-# subtitle_file = "alloy/subs/alloy1.srt"
-# audio_file = "alloy/audio/alloy1.mp3"
-# player = SubtitlePlayerApp(subtitle_file, audio_file)
-# player.run()
-
-# # BE CAREFUL THIS IS USING THE OLD BOOK READER CODE WHICH DOES NOT STRIP NEWLINES AT CHAPTER START/END
-# chapter_texts = [epubapp.get_chapter_text(chapter) for chapter in epubapp.book_items_list]
-# # create booktext as a single string with no newlines
-# booktext = ""
-# chapter_starts = []
-# paragraph_starts = []
-# current_idx = 0
-# for chapter in chapter_texts:
-#     chapter_starts.append(current_idx)
-#     # get paragraph starts
-#     p_starts = []
-#     for paragraph in chapter.splitlines():
-#         p_starts.append(current_idx)
-#         booktext += paragraph + " "
-#         current_idx += len(paragraph) + 1
-#     paragraph_starts.append(p_starts)
-
-
-
-# start_index = 0
-# book_time_dict = {}
-# print("syncing audio and ebooks")
-# # get lengths of all audio files
-# audio_files = glob.glob("alloy/audio/*")
-# audio_file_start_times = []
-# time_elapsed = 0
-# for file in audio_files:
-#     print(file)
-#     audio_file_start_times.append(time_elapsed)
-#     playback = Playback(file)
-#     time_elapsed += playback.duration
-
-# print(audio_file_start_times)
-
-# subtitle_files = glob.glob("alloy/subs/*")
-# for i, file in enumerate(subtitle_files):
-#     print(file)
-#     subtitles = pysrt.open(file)
-#     for s in subtitles:
-#         text = s.text.replace('\n', ' ')
-#         # Create a SequenceMatcher object
-#         matcher = difflib.SequenceMatcher(None, booktext, text)
-
-#         # Find the best matching substring within the larger text
-#         match = matcher.find_longest_match(start_index, min(
-#             start_index+200, len(booktext)), 0, len(text))
-
-#         if match.size > 0:
-#             # Start index of the best match
-#             start_index = match.a 
-#             # End index of the best match
-#             end_index = match.a + match.size
-
-#             # print("Start index:", start_index)
-#             # print("End index:", end_index)
-#             # print("Best match:", booktext[start_index:end_index])
-#             book_time_dict[start_index] = get_total_time(audio_file_start_times, i, player.subtitle_time_to_seconds(
-#                 s.start.to_time()))
-#         else:
-#             print("No match found.")
-
-#         book_index_list = list(book_time_dict.keys())
-#         is_strictly_increasing = all(i < j for i, j in zip(book_index_list, book_index_list[1:]))
-#         assert is_strictly_increasing
-
-
