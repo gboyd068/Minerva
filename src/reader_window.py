@@ -2,6 +2,8 @@ from kivymd.uix.label import MDLabel
 from bs4 import BeautifulSoup
 from ebooklib import epub
 from kivy.core.window import Window
+from kivymd.app import MDApp
+from kivy.clock import Clock
 
 class ReaderWindow(MDLabel):
     def on_size(self, *args):
@@ -26,6 +28,7 @@ class ReaderWindow(MDLabel):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.sync_script = None
         self.epub_file = None
         self.book = None
         self.current_item_index = 0
@@ -39,8 +42,13 @@ class ReaderWindow(MDLabel):
         self.page_buffer = 10
         self.my_max_lines = 0
         self.update_my_max_lines()
-        # self.load_epub(self.epub_file)
-        # self.display_page()
+        Clock.schedule_once(self._finish_init)
+    
+    def _finish_init(self, dt):
+        # get a reference for the slider so sync script can update it
+        app = MDApp.get_running_app()
+        self.sync_script = app.root.ids.player_screen.sync_script
+
 
     def generate_book_items_list(self, book):
         ordered_items = [id
@@ -230,6 +238,8 @@ class ReaderWindow(MDLabel):
             # hmmm
             if self.paragraph_within_chapter  > self.get_chapter_length(chapter) - 1:
                 self.paragraph_within_chapter = self.get_chapter_length(chapter) - 1
+            
+            self.sync_script.sync_to_text_position()
 
 
     def next_page(self):
@@ -243,6 +253,7 @@ class ReaderWindow(MDLabel):
             else:
                 self.paragraph_within_chapter += self.page_buffer
             self.display_page()
+            self.sync_script.sync_to_text_position()
             
 
     # def compute_pages(self):

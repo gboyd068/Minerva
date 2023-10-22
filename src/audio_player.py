@@ -40,7 +40,7 @@ class AudioPlayer():
         self.playback.play()
         self.playback.pause()
 
-    def go_to_audio_file_position(self, audio_file_idx, audio_position):
+    def go_to_audio_file_position(self, audio_file_idx, audio_position, sync=True):
         if  0 <= audio_file_idx < len(self.audio_filenames):
             if audio_file_idx != self.current_audio_idx:
                 self.current_audio_idx = audio_file_idx
@@ -49,8 +49,8 @@ class AudioPlayer():
                 self.playback.seek(audio_position)
                 self.current_audio_position = audio_position
                 Clock.schedule_once(self.set_slider_value)
-
-                self.sync_script.sync_to_audio_position()
+                if sync:
+                    self.sync_script.sync_to_audio_position()
 
             if self.playing:
                 self.playback.resume()
