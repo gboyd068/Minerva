@@ -2,16 +2,34 @@ from kivy.uix.screenmanager import Screen
 from kivy.animation import Animation
 from kivy.uix.button import Button
 from kivy.core.window import Window
-from kivymd.uix.button import MDIconButton
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import BooleanProperty, NumericProperty
+from kivy.clock import Clock
+from kivymd.uix.button import MDIconButton
+from kivymd.app import MDApp
+
+
 
 from src.reader_window import ReaderWindow
 from src.audio_player import AudioPlayer
-from scr.sync_script import SyncScript
-# create a syncing script class that is initialised by feeding in the audio player and the reader window
+from src.sync_script import SyncScript
 
 class PlayerScreen(Screen):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.sync_script = None
+        self.audio_player = None
+        # CANT ACCESS IDS BECAUSE THEY HAVENT BEEN CREATED YET so do the rest of the init after this has been done
+        Clock.schedule_once(self._finish_init)
+
+    def _finish_init(self, dt):
+        reader_window = self.ids.reader_window
+        # make audio player and sync script members of the player screen so kivy can access them
+        self.audio_player = AudioPlayer()
+        self.sync_script = SyncScript(self.audio_player, reader_window)
+
+
     def disable_buttons(self):
         top_toolbar_active = self.ids.top_toolbar.is_active
         audio_toolbar_active = self.ids.audio_toolbar.is_active
@@ -60,7 +78,16 @@ class MyToolbar(BoxLayout):
 
 
 class AudioToolbarButton(MDIconButton):
-    pass
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.sync_script = None
+        Clock.schedule_once(self._finish_init)
+
+    def _finish_init(self, dt):
+        app = MDApp.get_running_app()
+        # maybe I want this to be the sync script instead...
+        self.sync_script = app.root.ids.player_screen.sync_script
+        
 
 class TransparentButton(Button):
     # button class that is designed to be transparent and disablable depending on the current state

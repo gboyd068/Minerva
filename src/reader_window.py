@@ -38,7 +38,7 @@ class ReaderWindow(MDLabel):
         self.end_page_paragraph_pos = 0
         self.page_buffer = 10
         self.my_max_lines = 35 # needs to be set properly
-        # self.load_epub()
+        self.load_epub(self.epub_file)
         self.display_page()
 
     def generate_book_items_list(self, book):

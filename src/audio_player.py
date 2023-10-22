@@ -11,19 +11,21 @@ from kivy.clock import Clock
 from kivy.uix.slider import Slider
 from just_playback import Playback
 
-def AudioPlayer():
-    def __init__(self, audio_path):
+class AudioPlayer():
+    def __init__(self, audio_path=None):
+        self.audio_path = audio_path
         self.current_audio_idx = 0
         self.playback = None
         self.current_audio_position = None
         self.disable_saving = False
         self.playing = False
         self.audio_thread = None
-        self.audio_filenames = glob.glob(os.path.join(audio_path, "*.mp3"))
-        # self.timestamp_path = audio_path
-
+        
+        # THESE NEED TO GO INTO A LOADING FUNCTION
         # load the last played timestamp and load relevant audio file
-        self.load_last_played_timestamp()
+        # self.audio_filenames = glob.glob(os.path.join(audio_path, "*.mp3"))
+        # self.timestamp_path = audio_path
+        # self.load_last_played_timestamp()
 
 
         # self.slider = Slider(min=0, max=1, value=0, step=0.01)
@@ -33,8 +35,8 @@ def AudioPlayer():
 
         
         # self.slider.value = self.current_audio_position / self.playback.duration
-        self.playback.play()
-        self.playback.pause()
+        # self.playback.play()
+        # self.playback.pause()
 
     def load_audio_file(self, audio_file_idx):
         self.current_audio_idx = audio_file_idx
