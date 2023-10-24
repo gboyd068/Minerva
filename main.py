@@ -26,16 +26,14 @@ class MyMainApp(MDApp):
         # load settings here
         config = ConfigParser()
         config.read('mymain.ini')
-        # config.get('General', 'optionexample') etc
-
-
+        self.theme_cls.theme_style = config.get('General', 'theme')
         return kv
 
     def build_config(self, config):
         config.setdefaults("General", 
-                           {'boolexample': True,
-                            "pathexample": "path",
-                            "optionexample": "option1",
+                           {"library_path": "path",
+                            "theme": "Light",
+                            'boolexample': True,
                             }
                            )
 
@@ -44,15 +42,20 @@ class MyMainApp(MDApp):
 
     def on_config_change(self, config, section, key, value):
         # automatically called when a user changes a setting
-        pass
+        if key == "theme":
+            # this isn't changing text colour properly etc
+            self.theme_cls.theme_style = value
 
-    def on_stop(self):
+    def save_current_book_location(self):
         audio_player = self.root.ids.player_screen.audio_player
         if audio_player.playback is not None:
             audio_player.save_last_played_timestamp()
-            audio_player.disable_saving = True
-            if audio_player.playback.playing:
-                audio_player.toggle_play()
+
+    def on_stop(self):
+        self.save_current_book_location()
+        audio_player = self.root.ids.player_screen.audio_player
+        audio_player.disable_saving = True
+        if audio_player.playback is not None:
             audio_player.playback.stop()
 
 
