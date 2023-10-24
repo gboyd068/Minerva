@@ -20,21 +20,25 @@ class WindowManager(ScreenManager):
 
 class MyMainApp(MDApp):
     def build(self):
-        kv = Builder.load_file("main.kv")
-        self.settings_cls = SettingsWithSidebar
-        self.use_kivy_settings = False
         # load settings here
         config = ConfigParser()
         config.read('mymain.ini')
+        self.config = config
         self.theme_cls.theme_style = config.get('General', 'theme')
+
+        kv = Builder.load_file("main.kv")
+        self.settings_cls = SettingsWithSidebar
+        self.use_kivy_settings = False
         return kv
 
     def build_config(self, config):
         config.setdefaults("General", 
                            {"library_path": "path",
                             "theme": "Light",
-                            'boolexample': True,
-                            }
+                            'textmargin': 40,
+                            'font_size': 40,
+                            'skip_size': 30,
+                            },
                            )
 
     def build_settings(self, settings):
@@ -42,9 +46,15 @@ class MyMainApp(MDApp):
 
     def on_config_change(self, config, section, key, value):
         # automatically called when a user changes a setting
+        self.config = config
         if key == "theme":
-            # this isn't changing text colour properly etc
             self.theme_cls.theme_style = value
+        if key == "textmargin":
+            value = int(value)
+            self.root.ids.player_screen.ids.reader_window.padding = (value, value)
+        if key == "font_size":
+            value = int(value)
+            self.root.ids.player_screen.ids.reader_window.font_size = value
 
     def save_current_book_location(self):
         audio_player = self.root.ids.player_screen.audio_player

@@ -74,7 +74,8 @@
         pos_hint: {'left': 1, 'top': 1}
         size: Window.width, Window.height
         text_size: self.size
-        padding: 40, 40 # make this into a setting
+        font_size: app.config.getint('General', 'font_size')
+        padding: app.config.getint('General', 'textmargin'), app.config.getint('General', 'textmargin')
         # canvas.before:
         #     Color:
         #         rgba:0,0,0,1
@@ -162,7 +163,7 @@
                 AudioToolbarButton:
                     icon: "step-backward"
                     on_release:
-                        root.audio_player.go_to_audio_file_position(root.audio_player.current_audio_idx, root.audio_player.current_audio_position-30) # this should be a setting
+                        root.audio_player.go_to_audio_file_position(root.audio_player.current_audio_idx, root.audio_player.current_audio_position-app.config.getint('General', 'skip_size'))
 
                 PlayButton:
                     id: play_button
@@ -172,7 +173,7 @@
                 AudioToolbarButton:
                     icon: 'step-forward'
                     on_release:
-                        root.audio_player.go_to_audio_file_position(root.audio_player.current_audio_idx, root.audio_player.current_audio_position+30) # this should be a setting
+                        root.audio_player.go_to_audio_file_position(root.audio_player.current_audio_idx, root.audio_player.current_audio_position+app.config.getint('General', 'skip_size'))
 
                 AudioToolbarButton:
                     # close audio toolbar
