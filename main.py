@@ -34,11 +34,12 @@ class MyMainApp(MDApp):
 
     def on_stop(self):
         audio_player = self.root.ids.player_screen.audio_player
-        audio_player.save_last_played_timestamp()
-        audio_player.disable_saving = True
-        if audio_player.playback.playing:
-            audio_player.toggle_play()
-        audio_player.playback.stop()
+        if audio_player.playback is not None:
+            audio_player.save_last_played_timestamp()
+            audio_player.disable_saving = True
+            if audio_player.playback.playing:
+                audio_player.toggle_play()
+            audio_player.playback.stop()
 
 
 if __name__ == "__main__":

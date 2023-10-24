@@ -162,7 +162,7 @@
                 AudioToolbarButton:
                     icon: "step-backward"
                     on_release:
-                        # Add your code here
+                        root.audio_player.go_to_audio_file_position(root.audio_player.current_audio_idx, root.audio_player.current_audio_position-30) # this should be a setting
 
                 PlayButton:
                     id: play_button
@@ -171,6 +171,8 @@
 
                 AudioToolbarButton:
                     icon: 'step-forward'
+                    on_release:
+                        root.audio_player.go_to_audio_file_position(root.audio_player.current_audio_idx, root.audio_player.current_audio_position+30) # this should be a setting
 
                 AudioToolbarButton:
                     # close audio toolbar

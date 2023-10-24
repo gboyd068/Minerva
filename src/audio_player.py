@@ -46,11 +46,18 @@ class AudioPlayer():
                 self.current_audio_idx = audio_file_idx
                 self.load_audio_file(self.current_audio_idx)
             if 0 <= audio_position < self.playback.duration:
+                audio_position = max(0, audio_position)
                 self.playback.seek(audio_position)
                 self.current_audio_position = audio_position
                 Clock.schedule_once(self.set_slider_value)
-                if sync:
-                    self.sync_script.sync_to_audio_position()
+            if audio_position > self.playback.duration:
+                self.go_to_next_audio_file()
+            if audio_position < 0 and self.current_audio_idx > 0:
+                self.go_to_previous_audio_file()
+            
+            if sync:
+                self.sync_script.sync_to_audio_position()
+                
 
             if self.playing:
                 self.playback.resume()
@@ -62,10 +69,12 @@ class AudioPlayer():
 
 
     def go_to_next_audio_file(self):
-        self.go_to_audio_file_position(self.current_audio_idx + 1, 0)
+        if self.current_audio_idx < len(self.audio_filenames) - 2:
+            self.go_to_audio_file_position(self.current_audio_idx + 1, 0)
     
     def go_to_previous_audio_file(self):
-        self.go_to_audio_file_position(self.current_audio_idx - 1, 0)
+        if self.current_audio_idx > 0:
+            self.go_to_audio_file_position(self.current_audio_idx - 1, 0)
 
     def toggle_play(self):
         if not self.playing:

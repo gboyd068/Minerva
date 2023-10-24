@@ -27,7 +27,6 @@ class SyncScript():
         audio_file_idx = self.audio_player.current_audio_idx
         audio_position = self.audio_player.current_audio_position
         bookpos = self.bookpos_from_file_time(audio_file_idx, audio_position)
-        print(bookpos)
         self.reader_window.current_item_index = bookpos[0]
         self.reader_window.paragraph_within_chapter = bookpos[1]
         self.reader_window.start_page_paragraph_pos = 0
