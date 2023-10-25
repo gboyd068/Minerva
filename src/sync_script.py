@@ -104,6 +104,9 @@ class SyncScript():
         for i, file in enumerate(subtitle_files):
             subtitles = pysrt.open(file)
             for sidx, s in enumerate(subtitles):
+                # move on to next subtitle if that subtitle isn't in the book
+                if step_size > booktext//10:
+                    continue
                 text = s.text.replace('\n', ' ')
                 # Create a SequenceMatcher object
                 matcher = difflib.SequenceMatcher(None, booktext, text)
@@ -121,7 +124,7 @@ class SyncScript():
                     book_time_dict[start_index] = self.get_total_time(i, self.audio_player.subtitle_time_to_seconds(
                         s.start.to_time()))
                 else:
-                    print("No match found.")
+                    # print("No match found.")
                     step_size += 200
 
                 book_index_list = list(book_time_dict.keys())
