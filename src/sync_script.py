@@ -112,7 +112,7 @@ class SyncScript():
                 match = matcher.find_longest_match(start_index, min(
                     start_index+step_size, len(booktext)), 0, len(text))
 
-                if match.size > sub_length//4: # reasonable match is found
+                if match.size > sub_length//3: # reasonable match is found
                     step_size = 200
                     # Start index of the best match
                     start_index = match.a 
@@ -122,7 +122,7 @@ class SyncScript():
                         s.start.to_time()))
                 else:
                     print("No match found.")
-                    step_size *= 2
+                    step_size += 200
 
                 book_index_list = list(book_time_dict.keys())
                 is_strictly_increasing = all(i < j for i, j in zip(book_index_list, book_index_list[1:]))
