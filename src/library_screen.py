@@ -56,6 +56,7 @@ class LibraryScreen(Screen):
 
     
     def load_library(self):
+        self.ids.library_scroll_layout.clear_widgets()
         entries = glob.glob(os.path.join(self.library_path, "*"))
         subdirs = [entry for entry in entries if os.path.isdir(entry)]
         for subdir in subdirs:
