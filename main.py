@@ -2,6 +2,8 @@ from kivymd.app import MDApp
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.settings import SettingsWithSidebar, ConfigParser, SettingsWithNoMenu
+from kivy.core.window import Window
+from kivymd.uix.button import MDIconButton
 
 from src.library_screen import LibraryScreen
 from src.player_screen import PlayerScreen
@@ -16,20 +18,38 @@ Config.write()
 
 class WindowManager(ScreenManager):
     pass
+    # def __init__(self, **kwargs):
+    #     super().__init__(**kwargs)
+    #     self._keyboard = Window.request_keyboard(self._keyboard_closed, self)
+    #     self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
+    # def _keyboard_closed(self):
+    #     self._keyboard.unbind(on_key_down=self._on_keyboard_down)
+    #     self._keyboard = None
+
+    # def _on_keyboard_down(self, keyboard, keycode, text, modifiers):
+    #     print(keycode)
+
+
+class MySettings(SettingsWithNoMenu):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        app = MDApp.get_running_app()
+        close_button = MDIconButton(theme_icon_color="Custom", icon_color='white', icon="close", on_release=app.close_settings)
+        self.add_widget(close_button, 0, 'before')
 
 class MinervaApp(MDApp):
     def build(self):
         # load settings here
         config = ConfigParser()
-        config.read('mymain.ini')
+        config.read('minerva.ini')
         self.config = config
         self.theme_cls.theme_style = config.get('General', 'theme')
 
         # other settings handled in kv files
 
         kv = Builder.load_file("main.kv")
-        self.settings_cls = SettingsWithNoMenu
+        self.settings_cls = MySettings
         self.use_kivy_settings = False
         return kv
 

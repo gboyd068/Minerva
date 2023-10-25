@@ -1,53 +1,60 @@
 # library.kv
+#: include screens/player.kv
 
 <LibraryEntry>
     size_hint_y: None
     height: '150dp'
-    # background_normal: 'path/to/image.png'
-    # background_down: 'path/to/image_pressed.png'
     text: 'Title of the audiobook'
     font_size: '18sp'
     halign: 'left'
-    valign: 'middle'
+    valign: 'center'
     text_size: self.width - 20, self.height - 20
     on_release: 
         app.root.transition.direction = 'left'
         self.library_entry_selected()
 
     # Add a label for percentage completion
-    Label:
+    MDLabel:
         text: '50% complete'
+        pos_hint: {'bottom':1, 'right': 1}
         size_hint_y: None
-        height: '30dp'
+        height: '60dp'
         font_size: '14sp'
-        halign: 'left'
-        valign: 'middle'
-        text_size: self.width - 20, self.height - 20
+        halign: 'center'
+        valign: 'center'
+        text_size: self.width, self.height
 
 <LibraryScreen>:
     name: "library"
     orientation: 'vertical'
-    
 
-    ScrollView:
-        GridLayout:
-            id: library_scroll_layout
-            cols: 1
+    BoxLayout:
+        orientation: 'vertical'
+        MyToolbar:
+            # top toolbar
+            pos_hint: {"top": 1}
+            id: library_toolbar
+            inactive_y: Window.height - self.height
+            active_y: Window.height - self.height
             size_hint_y: None
-            height: self.minimum_height
-            spacing: '10dp'
+            y: self.inactive_y
+            height: "40dp"
+            padding: 0
+            spacing: Window.width - 2 * root.ids.settings_button.width
+
+            AudioToolbarButton:
+                id: settings_button
+                icon: "dots-vertical"
+                pos_hint: {"right": 1}
+                on_release:
+                    app.open_settings()
 
 
-    Label:
-        text: 'Library'
-        size_hint_y: None
-        height: '50dp'
-        font_size: '24sp'
-    
-    Button:
-        text: 'Go to Player'
-        size_hint_y: None
-        height: '50dp'
-        on_press: app.root.current = 'player'
-
+        ScrollView:
+            GridLayout:
+                id: library_scroll_layout
+                cols: 1
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: '10dp'
     
