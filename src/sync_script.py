@@ -100,27 +100,29 @@ class SyncScript():
         book_time_dict = {}
 
         subtitle_files = glob.glob(os.path.join(self.book_path, "subs", "*.srt"))
+        step_size = 200
         for i, file in enumerate(subtitle_files):
             subtitles = pysrt.open(file)
-            for s in subtitles:
+            for sidx, s in enumerate(subtitles):
                 text = s.text.replace('\n', ' ')
                 # Create a SequenceMatcher object
                 matcher = difflib.SequenceMatcher(None, booktext, text)
-
+                sub_length = len(text)
                 # Find the best matching substring within the larger text
                 match = matcher.find_longest_match(start_index, min(
-                    start_index+600, len(booktext)), 0, len(text))
+                    start_index+step_size, len(booktext)), 0, len(text))
 
-                if match.size > 0:
+                if match.size > sub_length//4: # reasonable match is found
+                    step_size = 200
                     # Start index of the best match
                     start_index = match.a 
                     # End index of the best match
                     end_index = match.a + match.size
                     book_time_dict[start_index] = self.get_total_time(i, self.audio_player.subtitle_time_to_seconds(
                         s.start.to_time()))
-
                 else:
                     print("No match found.")
+                    step_size *= 2
 
                 book_index_list = list(book_time_dict.keys())
                 is_strictly_increasing = all(i < j for i, j in zip(book_index_list, book_index_list[1:]))
@@ -137,6 +139,7 @@ class SyncScript():
 
 
     def load_book(self, book_path):
+        """loads a book from a path, returns metadata about the book for the library screen"""
         # if its a valid path then load it
         self.book_path = book_path
         # load ebook

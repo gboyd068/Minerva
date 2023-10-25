@@ -4,13 +4,15 @@ from kivymd.app import MDApp
 from kivy.clock import Clock
 import os
 import glob
+from ebooklib import epub
 
 
 class LibraryEntry(Button):
-    def __init__(self, book_path, **kwargs):
+    def __init__(self, book_path, book_title, book_author, **kwargs):
         super().__init__(**kwargs)
         self.book_path = book_path
-        # load how far through the book the user is etc
+        self.text = book_title
+        # get how far through the book the user is to display on the button
 
     def library_entry_selected(self):
         # add code for loading the selected book
@@ -21,6 +23,8 @@ class LibraryEntry(Button):
     def go_to_player_screen(self, dt):
         app = MDApp.get_running_app()
         app.root.current = "player"
+
+
 
 class LibraryScreen(Screen):
     def __init__(self, **kw):
@@ -59,4 +63,18 @@ class LibraryScreen(Screen):
                 self.add_library_entry(subdir)
 
     def add_library_entry(self, book_path):
-        self.ids.library_scroll_layout.add_widget(LibraryEntry(book_path))
+        # get the metadata from the epub file
+        book = epub.read_epub(glob.glob(os.path.join(book_path, "*.epub"))[0])
+        book_title = book.get_metadata("DC", "title")
+        book_author = book.get_metadata("DC", "creator")
+        # cover?
+        if len(book_title) != 0:
+            book_title = book_title[0][0]
+        if len(book_author) != 0:
+            book_author = book_author[0][0]
+
+        if book_title is None:
+            book_title = os.path.basename(book_path)
+        if book_author is None:
+            book_author = "Unknown Author"
+        self.ids.library_scroll_layout.add_widget(LibraryEntry(book_path, book_title=book_title, book_author=book_author))

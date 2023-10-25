@@ -18,7 +18,7 @@ class WindowManager(ScreenManager):
     pass
 
 
-class MyMainApp(MDApp):
+class MinervaApp(MDApp):
     def build(self):
         # load settings here
         config = ConfigParser()
@@ -50,7 +50,7 @@ class MyMainApp(MDApp):
         # automatically called when a user changes a setting
         self.config = config
         if key == "theme":
-            self.theme_cls.theme_style = value
+            self.theme_cls.theme_style = value 
         if key == "text_margin":
             value = int(value)
             self.root.ids.player_screen.ids.reader_window.padding = (value, value)
@@ -75,4 +75,4 @@ class MyMainApp(MDApp):
 
 
 if __name__ == "__main__":
-    MyMainApp().run()
+    MinervaApp().run()
