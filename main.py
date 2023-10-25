@@ -1,7 +1,7 @@
 from kivymd.app import MDApp
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.settings import SettingsWithSidebar, ConfigParser
+from kivy.uix.settings import SettingsWithSidebar, ConfigParser, SettingsWithNoMenu
 
 from src.library_screen import LibraryScreen
 from src.player_screen import PlayerScreen
@@ -26,16 +26,18 @@ class MyMainApp(MDApp):
         self.config = config
         self.theme_cls.theme_style = config.get('General', 'theme')
 
+        # other settings handled in kv files
+
         kv = Builder.load_file("main.kv")
-        self.settings_cls = SettingsWithSidebar
+        self.settings_cls = SettingsWithNoMenu
         self.use_kivy_settings = False
         return kv
 
     def build_config(self, config):
         config.setdefaults("General", 
-                           {"library_path": "path",
+                           {"library_path": ".",
                             "theme": "Light",
-                            'textmargin': 40,
+                            'text_margin': 40,
                             'font_size': 40,
                             'skip_size': 30,
                             },
@@ -49,12 +51,15 @@ class MyMainApp(MDApp):
         self.config = config
         if key == "theme":
             self.theme_cls.theme_style = value
-        if key == "textmargin":
+        if key == "text_margin":
             value = int(value)
             self.root.ids.player_screen.ids.reader_window.padding = (value, value)
         if key == "font_size":
             value = int(value)
             self.root.ids.player_screen.ids.reader_window.font_size = value
+        if key == "library_path":
+            self.root.ids.library_screen.library_path = value
+            self.root.ids.library_screen.load_library()
 
     def save_current_book_location(self):
         audio_player = self.root.ids.player_screen.audio_player

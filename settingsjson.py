@@ -50,7 +50,7 @@ settings_json = json.dumps([{ "type": "title", "title": "General" },
                             "title": "Text Margin",
                             "desc": "Sets the page margins",
                             "section": "General",
-                            "key": "textmargin" },
+                            "key": "text_margin" },
 
                             # line spacing?
 
