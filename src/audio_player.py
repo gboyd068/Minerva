@@ -87,9 +87,9 @@ class AudioPlayer():
             self.playback.pause()
             # self.play_button.text = "Resume"
 
-    def subtitle_time_to_seconds(self, time):
-        return (time.hour * 3600 + time.minute * 60 +
-                time.second) + time.microsecond / 1000000
+    def subtitle_time_to_seconds(self, sub_start):
+        return (sub_start.hours * 3600 + sub_start.minutes * 60 +
+                sub_start.seconds) + sub_start.milliseconds / 1000
 
     # maybe this main loop should instead go in a syncing class
     def audio_play_thread(self):
