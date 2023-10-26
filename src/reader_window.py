@@ -238,8 +238,6 @@ class ReaderWindow(MDLabel):
             # hmmm
             if self.paragraph_within_chapter  > self.get_chapter_length(chapter) - 1:
                 self.paragraph_within_chapter = self.get_chapter_length(chapter) - 1
-            
-            self.sync_script.sync_to_text_position()
 
 
     def next_page(self):
@@ -253,7 +251,6 @@ class ReaderWindow(MDLabel):
             else:
                 self.paragraph_within_chapter += self.page_buffer
             self.display_page()
-            self.sync_script.sync_to_text_position()
             
 
     # def compute_pages(self):

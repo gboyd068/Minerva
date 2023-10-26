@@ -155,10 +155,10 @@
                 spacing: (Window.width - 5 * root.ids.play_button.width) / 4
                 orientation: "horizontal"
                 AudioToolbarButton:
-                    # this will become a volume slider / mute button
-                    icon: "volume-high"
+                    # sync to text button
+                    icon: "book-sync-outline"
                     on_release:
-                        # Add your code here
+                        root.sync_script.sync_to_text_position()
 
                 AudioToolbarButton:
                     icon: "step-backward"
