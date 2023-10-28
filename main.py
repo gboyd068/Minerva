@@ -91,7 +91,7 @@ class MinervaApp(MDApp):
         audio_player = self.root.ids.player_screen.audio_player
         audio_player.disable_saving = True
         if audio_player.playback is not None:
-            audio_player.playback.stop()
+            audio_player.playback.pause()
 
 
 if __name__ == "__main__":

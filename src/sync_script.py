@@ -1,16 +1,12 @@
 import difflib
-# from epub_render import EPUBReaderApp
-# from audio_player import SubtitlePlayerApp
 import os
 import glob
 import json
 import pysrt
-from just_playback import Playback
 from kivy.clock import Clock
-from kivymd.app import MDApp
 from kivymd.uix.dialog import MDDialog
 from kivy.core.window import Window
-from threading import Thread
+from src.playback import Playback
 
 class SyncScript():
     def __init__(self, audio_player, reader_window):
@@ -212,9 +208,9 @@ class SyncScript():
         bookpos = self.get_chapter_paragraph_position(book_index)
         return bookpos
 
-    def get_total_time(self, audio_file_index, time):
+    def get_total_time(self, audio_file_index, file_time):
         """takes the current audio file index and the time in that file and returns the total time elapsed"""
-        total_time = self.audio_file_start_times[audio_file_index] + time
+        total_time = self.audio_file_start_times[audio_file_index] + file_time
         return total_time
 
     def get_audio_file_index_and_file_time(self, total_time):
