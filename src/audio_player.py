@@ -22,6 +22,7 @@ class AudioPlayer():
         self.audio_thread = None
         self.slider = None
         self.sync_script = None
+        self.playback_speed = float(MDApp.get_running_app().config.get("General", "playback_speed"))
         Clock.schedule_once(self._finish_init)
     
     def _finish_init(self, dt):
@@ -38,7 +39,7 @@ class AudioPlayer():
     def load_audio_file(self, audio_file_idx, start_time=0):
         print(start_time)
         self.current_audio_idx = audio_file_idx
-        self.playback = Playback(filename=self.audio_filenames[self.current_audio_idx], ff_opts={'ss': start_time,'af': f'atempo={1}', 'vn': True})
+        self.playback = Playback(filename=self.audio_filenames[self.current_audio_idx], ff_opts={'ss': start_time,'af': f'atempo={self.playback_speed}', 'vn': True})
         if self.playing:
             self.playback.play()
         print(self.playback.get_pts())

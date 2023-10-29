@@ -60,6 +60,7 @@ class MinervaApp(MDApp):
                             'text_margin': 40,
                             'font_size': 40,
                             'skip_size': 30,
+                            'playback_speed': 1.0
                             },
                            )
 
@@ -80,6 +81,10 @@ class MinervaApp(MDApp):
         if key == "library_path":
             self.root.ids.library_screen.library_path = value
             self.root.ids.library_screen.load_library()
+        if key == "playback_speed":
+            audio_player = self.root.ids.player_screen.audio_player
+            audio_player.playback_speed = float(value)
+            audio_player.load_audio_file(audio_player.current_audio_idx, audio_player.current_audio_position)
 
     def save_current_book_location(self):
         audio_player = self.root.ids.player_screen.audio_player

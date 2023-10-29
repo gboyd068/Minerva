@@ -27,7 +27,13 @@ settings_json = json.dumps([{ "type": "title", "title": "General" },
 
                             { "type": "title", "title": "Audio" },
 
-                            # playback speed HMMMMMMMMM
+                            # playback speed
+                            { "type": "options",
+                            "title": "Playback Speed",
+                            "desc": "",
+                            "section": "General",
+                            "key": "playback_speed",
+                            "options": ["0.5", "0.75", "1.0", "1.1", "1.2", "1.25", "1.5", "2.0"]},
 
                             # skip distance
                             { "type": "numeric",
