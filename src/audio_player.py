@@ -71,6 +71,7 @@ class AudioPlayer():
 
         if sync:
             self.sync_script.sync_to_audio_position()
+        self.disable_auto_slider = False
             
     
     def go_to_next_audio_file(self):
