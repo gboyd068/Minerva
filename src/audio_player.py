@@ -18,6 +18,7 @@ class AudioPlayer():
         self.current_audio_position = None
         self.disable_saving = False
         self.playing = False
+        self.disable_auto_slider = False
         self.audio_thread = None
         self.slider = None
         self.sync_script = None
@@ -58,7 +59,7 @@ class AudioPlayer():
             # self.playback.seek(audio_position)
             # self.current_audio_position = audio_position
             self.load_audio_file(self.current_audio_idx, audio_position)
-            # Clock.schedule_once(self.set_slider_value)
+            Clock.schedule_once(self.set_slider_value)
         if audio_position > self.playback.duration:
             self.go_to_next_audio_file()
         if audio_position < 0 and self.current_audio_idx > 0:
@@ -80,6 +81,7 @@ class AudioPlayer():
             self.go_to_audio_file_position(self.current_audio_idx - 1, 0)
 
     def toggle_play(self):
+        """this is probably broken and needs to change"""
         if not self.playing:
             self.playing = True
             # self.play_button.text = "Pause"
@@ -94,25 +96,26 @@ class AudioPlayer():
         return (sub_start.hours * 3600 + sub_start.minutes * 60 +
                 sub_start.seconds) + sub_start.milliseconds / 1000
 
-    # maybe this main loop should instead go in a syncing class
     def audio_play_thread(self):
         # self.playback.seek(self.current_audio_position)
         self.playback.play()
 
-        # while not self.playback.get_pause():
-        #     time.sleep(0.1)
-        #     self.current_audio_position = self.playback.get_pts()
-        #     Clock.schedule_once(self.set_slider_value)
-        #     self.save_last_played_timestamp()
+        while not self.playback.get_pause() and not self.disable_auto_slider:
+            time.sleep(0.1)
+            self.current_audio_position = self.playback.get_pts()
+            Clock.schedule_once(self.set_slider_value)
+            self.save_last_played_timestamp()
 
     def set_slider_value(self, dt=None):
         self.slider.value = self.current_audio_position / self.playback.duration
 
     def on_slider_value_change(self, instance, value):
+        self.disable_auto_slider = True
         # Calculate the new audio position based on the slider value
         new_audio_position = value * self.playback.duration
         if abs(new_audio_position - self.current_audio_position) > 1:
             self.go_to_audio_file_position(self.current_audio_idx, new_audio_position)
+        self.disable_auto_slider = False
         
 
     def save_last_played_timestamp(self):
