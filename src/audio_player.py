@@ -1,5 +1,6 @@
 import glob
 import os
+import pathlib
 import json
 import threading
 import time
@@ -34,15 +35,15 @@ class AudioPlayer():
 
     def load_audio_path(self, audio_path):
         self.audio_filenames = glob.glob(os.path.join(audio_path, "*.mp3"))
-        self.timestamp_path = os.path.join(audio_path, "last_played_timestamp.json")
+        book_dir_name = str(pathlib.Path(audio_path).parents[0])
+        user_data_dir = MDApp.get_running_app().user_data_dir
+        self.timestamp_path = os.path.join(user_data_dir, book_dir_name, "last_played_timestamp.json")
 
     def load_audio_file(self, audio_file_idx, start_time=0):
-        print(start_time)
         self.current_audio_idx = audio_file_idx
         self.playback = Playback(filename=self.audio_filenames[self.current_audio_idx], ff_opts={'ss': start_time,'af': f'atempo={self.playback_speed}', 'vn': True})
         if self.playing:
             self.playback.play()
-        print(self.playback.get_pts())
         self.current_audio_position = start_time
 
     def go_to_audio_file_position(self, audio_file_idx, audio_position, sync=True):
@@ -126,6 +127,8 @@ class AudioPlayer():
         try:
             timestamp = {"audio_file_idx": self.current_audio_idx,
                          "audio_position": self.playback.get_pts()}
+            if not os.path.exists(self.timestamp_path):
+                os.makedirs(os.path.dirname(self.timestamp_path))
             with open(self.timestamp_path, "w+") as file:
                 json.dump(timestamp, file)
         except FileNotFoundError:

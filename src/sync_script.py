@@ -5,6 +5,7 @@ import json
 import pysrt
 from kivy.clock import Clock
 from kivymd.uix.dialog import MDDialog
+from kivymd.app import MDApp
 from kivy.core.window import Window
 from src.playback import Playback
 
@@ -34,8 +35,15 @@ class SyncScript():
         self.audio_player.go_to_audio_file_position(audio_file_idx, audio_position, sync=False)
 
     def load_sync_data(self):
+        """loads sync data from a json file if it exists, otherwise returns False"""
+        user_data_dir = MDApp.get_running_app().user_data_dir
+        book_dir_name = os.path.basename(self.book_path)
+        book_data_dir = os.path.join(user_data_dir, book_dir_name)
+        self.sync_data_path = os.path.join(book_data_dir, "sync_data.json")
         try:
-            with open(os.path.join(self.book_path, "sync_data.json")) as f:
+            if not os.path.exists(book_data_dir):
+                os.makedirs(book_data_dir)
+            with open(self.sync_data_path) as f:
                 sync_data = json.load(f)
             # check the sync_data is valid
             assert "chapter_starts" in sync_data
@@ -74,7 +82,7 @@ class SyncScript():
         time_elapsed = 0
         for file in audio_files:
             audio_file_start_times.append(time_elapsed)
-            playback = Playback(file)
+            playback = Playback(filename=file)
             time_elapsed += playback.duration
         return audio_file_start_times
 
@@ -129,7 +137,7 @@ class SyncScript():
 
         sync_data["book_time_dict"] = book_time_dict
 
-        with open(os.path.join(self.book_path, "sync_data.json"), 'w+') as f:
+        with open(self.sync_data_path, 'w+') as f:
             json.dump(sync_data, f)
         self._finish_load_book(sync_data)
         dialog.dismiss()

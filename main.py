@@ -45,7 +45,6 @@ class MinervaApp(MDApp):
         config.read('minerva.ini')
         self.config = config
         self.theme_cls.theme_style = config.get('General', 'theme')
-
         # other settings handled in kv files
 
         kv = Builder.load_file("main.kv")
