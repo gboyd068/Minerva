@@ -127,7 +127,7 @@ class AudioPlayer():
         try:
             timestamp = {"audio_file_idx": self.current_audio_idx,
                          "audio_position": self.playback.get_pts()}
-            if not os.path.exists(self.timestamp_path):
+            if not os.path.exists(os.path.dirname(self.timestamp_path)):
                 os.makedirs(os.path.dirname(self.timestamp_path))
             with open(self.timestamp_path, "w+") as file:
                 json.dump(timestamp, file)
