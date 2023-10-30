@@ -78,6 +78,7 @@ class MinervaApp(MDApp):
 
         self.exit_manager()
         self.config.set('General', 'library_path', path)
+        self.root.ids.library_screen.load_library()
         toast(path)
 
     def exit_manager(self, *args):
