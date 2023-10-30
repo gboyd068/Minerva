@@ -3,8 +3,9 @@ from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.settings import SettingsWithNoMenu
 from kivymd.uix.button import MDIconButton
+from kivymd.uix.filemanager import MDFileManager
 from kivymd.toast import toast
-from plyer import filechooser
+from kivy.clock import Clock
 
 from src.library_screen import LibraryScreen
 from src.player_screen import PlayerScreen
@@ -34,19 +35,44 @@ class MySettings(SettingsWithNoMenu):
         self.add_widget(close_button, 0, 'before')
 
 class MinervaApp(MDApp):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.manager_open = False
+        self.file_manager = MDFileManager(
+            exit_manager=self.exit_manager,
+            select_path=self.select_path,
+            preview=True,
+        )
+
     def build(self):
         kv = Builder.load_file("main.kv")
         self.settings_cls = MySettings
         self.use_kivy_settings = False
         self.theme_cls.theme_style = self.config.get('General', 'theme')
-        self.file_manager_open()
+        Clock.schedule_once(self.file_manager_open)
         return kv
     
-    def file_manager_open(self):
-        path = filechooser.choose_dir()[0] 
-        # this method returns a list with the first index
-        # being the path of the file selected
+    def file_manager_open(self,dt):
+        self.file_manager.show(self.user_data_dir)  # output manager to the screen
+        self.manager_open = True
+
+    def select_path(self, path):
+        '''It will be called when you click on the file name
+        or the catalog selection button.
+
+        :type path: str;
+        :param path: path to the selected directory or file;
+        '''
+
+        self.exit_manager()
         toast(path)
+
+    def exit_manager(self, *args):
+        '''Called when the user reaches the root of the directory tree.'''
+
+        self.manager_open = False
+        self.file_manager.close()
 
     def build_config(self, config):
         config.adddefaultsection('General') 
