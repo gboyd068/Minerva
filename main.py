@@ -5,6 +5,7 @@ from kivy.uix.settings import SettingsWithNoMenu
 from kivymd.uix.button import MDIconButton
 from kivymd.uix.filemanager import MDFileManager
 from kivymd.toast import toast
+from kivy.utils import platform
 from kivy.clock import Clock
 
 from src.library_screen import LibraryScreen
@@ -34,6 +35,7 @@ class MySettings(SettingsWithNoMenu):
         close_button = MDIconButton(theme_icon_color="Custom", icon_color='white', icon="close", on_release=app.close_settings)
         self.add_widget(close_button, 0, 'before')
 
+
 class MinervaApp(MDApp):
 
     def __init__(self, **kwargs):
@@ -44,6 +46,12 @@ class MinervaApp(MDApp):
             select_path=self.select_path,
             preview=True,
         )
+        self.primary_ext_storage = None
+        if platform=="android":
+            from android.storage import primary_external_storage_path
+            self.primary_ext_storage = primary_external_storage_path()
+            from android.permissions import request_permissions, Permission
+            request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_EXTERNAL_STORAGE])
 
     def build(self):
         kv = Builder.load_file("main.kv")
@@ -54,7 +62,10 @@ class MinervaApp(MDApp):
         return kv
     
     def file_manager_open(self,dt):
-        self.file_manager.show(self.user_data_dir)  # output manager to the screen
+        dir = self.user_data_dir
+        if self.primary_ext_storage is not None:
+            dir = self.primary_ext_storage
+        self.file_manager.show(dir)  # output manager to the screen
         self.manager_open = True
 
     def select_path(self, path):
