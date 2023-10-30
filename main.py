@@ -1,3 +1,5 @@
+import glob
+import os
 from kivymd.app import MDApp
 from kivy.lang import Builder
 from kivy.uix.screenmanager import ScreenManager
@@ -77,6 +79,7 @@ class MinervaApp(MDApp):
         '''
 
         self.exit_manager()
+        print(glob.glob(os.path.join(path, "*"), recursive=True))
         self.config.set('General', 'library_path', path)
         self.root.ids.library_screen.library_path = path
         self.root.ids.library_screen.load_library()
