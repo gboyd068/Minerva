@@ -1,19 +1,14 @@
 from kivymd.app import MDApp
 from kivy.lang import Builder
-from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.uix.settings import SettingsWithSidebar, ConfigParser, SettingsWithNoMenu
-from kivy.core.window import Window
+from kivy.uix.screenmanager import ScreenManager
+from kivy.uix.settings import SettingsWithNoMenu
 from kivymd.uix.button import MDIconButton
+from kivymd.toast import toast
+from plyer import filechooser
 
 from src.library_screen import LibraryScreen
 from src.player_screen import PlayerScreen
-from kivy.config import Config
-
 from settingsjson import settings_json
-
-Config.set('graphics', 'width', '400')
-Config.set('graphics', 'height', '700')
-Config.write()
 
 
 class WindowManager(ScreenManager):
@@ -40,28 +35,27 @@ class MySettings(SettingsWithNoMenu):
 
 class MinervaApp(MDApp):
     def build(self):
-        # load settings here
-        config = ConfigParser()
-        config.read('minerva.ini')
-        self.config = config
-        self.theme_cls.theme_style = config.get('General', 'theme')
-        # other settings handled in kv files
-
         kv = Builder.load_file("main.kv")
         self.settings_cls = MySettings
         self.use_kivy_settings = False
+        self.theme_cls.theme_style = self.config.get('General', 'theme')
+        self.file_manager_open()
         return kv
+    
+    def file_manager_open(self):
+        path = filechooser.choose_dir()[0] 
+        # this method returns a list with the first index
+        # being the path of the file selected
+        toast(path)
 
     def build_config(self, config):
-        config.setdefaults("General", 
-                           {"library_path": ".",
-                            "theme": "Light",
-                            'text_margin': 40,
-                            'font_size': 40,
-                            'skip_size': 30,
-                            'playback_speed': 1.0
-                            },
-                           )
+        config.adddefaultsection('General') 
+        config.setdefault('General','library_path', '.')
+        config.setdefault('General', 'theme', 'Light')
+        config.setdefault('General','text_margin', 40)
+        config.setdefault('General','font_size', 40)
+        config.setdefault('General','skip_size', 30)
+        config.setdefault('General','playback_speed', 1.0)
 
     def build_settings(self, settings):
         settings.add_json_panel('General', self.config, data=settings_json)
@@ -83,7 +77,8 @@ class MinervaApp(MDApp):
         if key == "playback_speed":
             audio_player = self.root.ids.player_screen.audio_player
             audio_player.playback_speed = float(value)
-            audio_player.load_audio_file(audio_player.current_audio_idx, audio_player.current_audio_position)
+            if audio_player.playback is not None and audio_player.current_audio_idx is not None:
+                audio_player.load_audio_file(audio_player.current_audio_idx, audio_player.current_audio_position)
 
     def save_current_book_location(self):
         audio_player = self.root.ids.player_screen.audio_player
