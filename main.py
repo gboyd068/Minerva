@@ -10,6 +10,11 @@ from kivymd.toast import toast
 from kivy.utils import platform
 from kivy.clock import Clock
 
+if platform == "android":
+    from pyjnius import autoclass
+    from jnius import cast
+    from android import activity
+
 from src.library_screen import LibraryScreen
 from src.player_screen import PlayerScreen
 from settingsjson import settings_json
@@ -49,11 +54,37 @@ class MinervaApp(MDApp):
             preview=True,
         )
         self.primary_ext_storage = None
-        if platform=="android":
-            from android.storage import primary_external_storage_path
-            self.primary_ext_storage = primary_external_storage_path()
-            from android.permissions import request_permissions, Permission
-            request_permissions([Permission.WRITE_EXTERNAL_STORAGE, Permission.READ_EXTERNAL_STORAGE])
+        self.permissions_external_storage()
+        
+
+    def permissions_external_storage(self, *args):                  
+        if platform == "android":
+            PythonActivity = autoclass("org.kivy.android.PythonActivity")
+            Environment = autoclass("android.os.Environment")
+            Intent = autoclass("android.content.Intent")
+            Settings = autoclass("android.provider.Settings")
+            Uri = autoclass("android.net.Uri")
+                # If you have access to the external storage, do whatever you need
+            if Environment.isExternalStorageManager():
+                # If you don't have access, launch a new activity to show the user the system's dialog
+                # to allow access to the external storage
+                pass
+            else:
+                try:
+                    activity = PythonActivity.mActivity.getApplicationContext()
+                    uri = Uri.parse("package:" + activity.getPackageName())
+                    intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri)
+                    currentActivity = cast(
+                    "android.app.Activity", PythonActivity.mActivity
+                    )
+                    currentActivity.startActivityForResult(intent, 101)
+                except:
+                    intent = Intent()
+                    intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                    currentActivity = cast(
+                    "android.app.Activity", PythonActivity.mActivity
+                    )
+                    currentActivity.startActivityForResult(intent, 101)
 
     def build(self):
         kv = Builder.load_file("main.kv")
