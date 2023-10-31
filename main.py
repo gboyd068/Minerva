@@ -11,9 +11,10 @@ from kivy.utils import platform
 from kivy.clock import Clock
 
 if platform == "android":
-    from pyjnius import autoclass
+    from jnius import autoclass
     from jnius import cast
     from android import activity
+    from android.storage import primary_external_storage_path
 
 from src.library_screen import LibraryScreen
 from src.player_screen import PlayerScreen
@@ -59,6 +60,7 @@ class MinervaApp(MDApp):
 
     def permissions_external_storage(self, *args):                  
         if platform == "android":
+            self.primary_ext_storage = primary_external_storage_path()
             PythonActivity = autoclass("org.kivy.android.PythonActivity")
             Environment = autoclass("android.os.Environment")
             Intent = autoclass("android.content.Intent")

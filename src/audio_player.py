@@ -41,7 +41,7 @@ class AudioPlayer():
 
     def load_audio_file(self, audio_file_idx, start_time=0):
         self.current_audio_idx = audio_file_idx
-        self.playback = Playback(filename=self.audio_filenames[self.current_audio_idx], ff_opts={'ss': start_time,'af': f'atempo={self.playback_speed}', 'vn': True})
+        self.playback = Playback(filename=self.audio_filenames[self.current_audio_idx], ff_opts={'ss': start_time}) # ,'af': f'atempo={self.playback_speed}', 'vn': True})
         if self.playing:
             self.playback.play()
         self.current_audio_position = start_time
