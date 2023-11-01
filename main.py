@@ -144,9 +144,11 @@ class MinervaApp(MDApp):
         if key == "text_margin":
             value = int(value)
             self.root.ids.player_screen.ids.reader_window.padding = (value, value)
+            self.root.ids.player_screen.ids.reader_window.display_page()
         if key == "font_size":
             value = int(value)
             self.root.ids.player_screen.ids.reader_window.font_size = value
+            self.root.ids.player_screen.ids.reader_window.display_page()
         if key == "library_path":
             self.root.ids.library_screen.library_path = value
             self.root.ids.library_screen.load_library()
