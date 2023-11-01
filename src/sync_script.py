@@ -19,12 +19,18 @@ class SyncScript():
         self.chapter_starts = []
         self.paragraph_starts = []
         self.audio_file_start_times = []
+        self.end_page_bookpos = None
+        self.sync_data_path = None
+
+    def update_end_page_bookpos(self, bookpos):
+        self.end_page_bookpos = bookpos
     
     def sync_to_audio_position(self):
         audio_file_idx = self.audio_player.current_audio_idx
         audio_position = self.audio_player.current_audio_position
         bookpos = self.bookpos_from_file_time(audio_file_idx, audio_position)
         self.reader_window.current_item_index = bookpos[0]
+        self.reader_window.chapter_text = self.reader_window.get_chapter_text(self.reader_window.book_items_list[bookpos[0]])
         self.reader_window.paragraph_within_chapter = bookpos[1]
         self.reader_window.start_page_paragraph_pos = 0
         self.reader_window.display_page()

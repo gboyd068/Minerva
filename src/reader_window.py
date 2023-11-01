@@ -7,7 +7,7 @@ from kivy.clock import Clock
 
 class ReaderWindow(MDLabel):
     def on_size(self, *args):
-        pass
+        self.text_size = self.size
         # self.update_my_max_lines()
         # self.display_page()
 
@@ -36,9 +36,11 @@ class ReaderWindow(MDLabel):
         self.num_book_items = 0
         self.scroll_view = None
         self.pages = []
+        self.chapter_text = None
         self.paragraph_within_chapter = 0  # paragraph number within chapter
         self.start_page_paragraph_pos = 0
         self.end_page_paragraph_pos = 0
+        self.end_page_bookpos = None
         self.page_buffer = 10
         self.my_max_lines = 0
         self.update_my_max_lines()
@@ -60,7 +62,7 @@ class ReaderWindow(MDLabel):
         self.book = epub.read_epub(epub_file)
         self.book_items_list = self.generate_book_items_list(self.book)
         self.num_book_items = len(self.book_items_list)
-        self.display_page()
+        # self.display_page()
 
     def update_page_buffer(self, page_text, prev=False):
         # lines that are currently being drawn to text_label
@@ -119,7 +121,7 @@ class ReaderWindow(MDLabel):
                     else:
                         end_paragraph_complete = True
                         self.end_page_paragraph_pos = 0
-        
+
         # print("num_cached_lines", len(cached_lines))
         if len(cached_lines) < self.my_max_lines:
             # page not full, go back / forward a chapter by setting the page buffer to a large number
@@ -156,6 +158,17 @@ class ReaderWindow(MDLabel):
         if start_paragraph_idx == 0 and end_paragraph_idx == 0:
             self.page_buffer = 50
 
+        # update the end page book position in the sync script so the audio_player knows when to turn the page
+        if not prev:
+            if self.paragraph_within_chapter + self.page_buffer >= self.get_chapter_length(self.book_items_list[self.current_item_index]):
+                self.end_page_bookpos = (self.current_item_index+1, 0, 0)
+            else:   
+                self.end_page_bookpos = (self.current_item_index, self.paragraph_within_chapter+self.page_buffer, self.end_page_paragraph_pos)
+        if prev:
+            self.end_page_bookpos = (self.current_item_index, self.paragraph_within_chapter, self.end_page_paragraph_pos)
+        
+        self.sync_script.update_end_page_bookpos(self.end_page_bookpos)
+
 
 
     def display_page(self, prev=False):
@@ -171,10 +184,9 @@ class ReaderWindow(MDLabel):
         if 0 <= self.current_item_index < self.num_book_items:
             item = self.book_items_list[self.current_item_index]
             # if item.get_type() == ebooklib.ITEM_DOCUMENT:
-            chapter_text = self.get_chapter_text(item)
             # get lines between self.paragraph_within_chapter and self.paragraph_within_chapter + self.page_buffer
-            page_text = self.get_page_text(chapter_text, start, end, prev)
-            page_text_no_cutoff = self.get_page_text(chapter_text, start, end, prev, cuttoff=False)
+            page_text = self.get_page_text(self.chapter_text, start, end, prev)
+            page_text_no_cutoff = self.get_page_text(self.chapter_text, start, end, prev, cuttoff=False)
             self.text = page_text
             self.texture_update()
             self.update_page_buffer(page_text_no_cutoff, prev)
@@ -228,6 +240,7 @@ class ReaderWindow(MDLabel):
                 # go to previous chapter
                 self.current_item_index -= 1
                 chapter = self.book_items_list[self.current_item_index]
+                self.chapter_text = self.get_chapter_text(chapter)
                 self.paragraph_within_chapter = self.get_chapter_length(chapter) - 1
             
             # print("------------\nparagraph within chapter", self.paragraph_within_chapter)
@@ -248,6 +261,8 @@ class ReaderWindow(MDLabel):
                 # go to next chapter
                 self.current_item_index += 1
                 self.paragraph_within_chapter = 0
+                chapter = self.book_items_list[self.current_item_index]
+                self.chapter_text = self.get_chapter_text(chapter)
             else:
                 self.paragraph_within_chapter += self.page_buffer
             self.display_page()

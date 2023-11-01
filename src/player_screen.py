@@ -74,7 +74,16 @@ class MyToolbar(BoxLayout):
             else:
                 Animation(size=(Window.width, Window.height),
                           duration=self.duration).start(reader_window)
-            reader_window.display_page()
+            
+            # reader_window.display_page()
+            # Clock.schedule_once(reader_window.display_page, self.duration)
+            # reader_window.texture_update()
+            # print(reader_window.page_buffer)
+            # chapter_text = reader_window.chapter_text
+
+            # page_text_no_cutoff = self.get_page_text(chapter_text, start, end, prev, cuttoff=False)
+            # reader_window.display_page()
+            # print(reader_window.page_buffer)
 
 
 class AudioToolbarButton(MDIconButton):
