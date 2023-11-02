@@ -39,9 +39,19 @@ class AudioPlayer():
         user_data_dir = MDApp.get_running_app().user_data_dir
         self.timestamp_path = os.path.join(user_data_dir, book_dir_name, "last_played_timestamp.json")
 
+    def audio_callback(self, selector,value):
+            print("selector", selector)
+            print(type(selector))
+            print("value", value)
+            if selector == "eof":
+                self.disable_auto_slider = True
+                self.load_audio_file(self.current_audio_idx + 1, 0)
+                self.disable_auto_slider = False
+
+
     def load_audio_file(self, audio_file_idx, start_time=0):
         self.current_audio_idx = audio_file_idx
-        self.playback = Playback(filename=self.audio_filenames[self.current_audio_idx], ff_opts={'ss': start_time}) # ,'af': f'atempo={self.playback_speed}', 'vn': True})
+        self.playback = Playback(filename=self.audio_filenames[self.current_audio_idx], callback=self.audio_callback, ff_opts={'ss': start_time, 'vn': True, "af": f"atempo={self.playback_speed}"})
         if self.playing:
             self.audio_thread = threading.Thread(target=self.audio_play_thread)
             self.audio_thread.start()
