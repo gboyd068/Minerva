@@ -21,17 +21,20 @@ class AudioPlayer():
         self.playing = False
         self.disable_auto_slider = False
         self.audio_thread = None
+        self.end_audio_thread = False
+        self.start_time = 0
         self.slider = None
         self.sync_script = None
+        self.eof_reached = False
         self.playback_speed = float(MDApp.get_running_app().config.get("General", "playback_speed"))
         Clock.schedule_once(self._finish_init)
     
     def _finish_init(self, dt):
         # get a reference for the slider so sync script can update it
         app = MDApp.get_running_app()
-        self.slider = app.root.ids.player_screen.audio_slider
+        self.slider = app.root.player_screen.audio_slider
         self.slider.bind(value=self.on_slider_value_change)
-        self.sync_script = app.root.ids.player_screen.sync_script
+        self.sync_script = app.root.player_screen.sync_script
 
     def load_audio_path(self, audio_path):
         self.audio_filenames = glob.glob(os.path.join(audio_path, "*.mp3"))
@@ -40,18 +43,20 @@ class AudioPlayer():
         self.timestamp_path = os.path.join(user_data_dir, book_dir_name, "last_played_timestamp.json")
 
     def audio_callback(self, selector,value):
-            print("selector", selector)
-            print(type(selector))
-            print("value", value)
+            if selector == "read:exit":
+                Clock.schedule_once(self.set_slider_value)
             if selector == "eof":
-                self.disable_auto_slider = True
-                self.load_audio_file(self.current_audio_idx + 1, 0)
-                self.disable_auto_slider = False
+                print("eof")
+                self.playback.pause()
+                self.eof_reached = True
 
 
     def load_audio_file(self, audio_file_idx, start_time=0):
+        # FUCK THIS IS CALLED FROM AUDIO_PLAY_THREAD
+        print("loading audio file")
+        self.start_time  = start_time
         self.current_audio_idx = audio_file_idx
-        self.playback = Playback(filename=self.audio_filenames[self.current_audio_idx], callback=self.audio_callback, ff_opts={'ss': start_time, 'vn': True, "af": f"atempo={self.playback_speed}"})
+        self.playback = Playback(filename=self.audio_filenames[self.current_audio_idx], callback=self.audio_callback, ff_opts={'sync': 'ext', 'ss': start_time, 'vn': True, 'af': f'atempo={self.playback_speed}'})
         if self.playing:
             self.audio_thread = threading.Thread(target=self.audio_play_thread)
             self.audio_thread.start()
@@ -66,17 +71,16 @@ class AudioPlayer():
         # playing = not self.playback.get_pause()
         # if playing:
         #     self.toggle_play()
-        
-        if 0 <= audio_position < self.playback.duration:
-            audio_position = max(0, audio_position)
-            # self.playback.seek(audio_position)
-            # self.current_audio_position = audio_position
-            self.load_audio_file(self.current_audio_idx, audio_position)
-            Clock.schedule_once(self.set_slider_value)
-        if audio_position > self.playback.duration:
-            self.go_to_next_audio_file()
-        if audio_position < 0 and self.current_audio_idx > 0:
-            self.go_to_previous_audio_file()
+        if audio_file_idx == self.current_audio_idx:
+            if 0 <= audio_position < self.playback.duration:
+                audio_position = max(0, audio_position)
+                # self.playback.seek(audio_position)
+                # self.current_audio_position = audio_position
+                self.load_audio_file(self.current_audio_idx, audio_position)
+            if audio_position > self.playback.duration:
+                self.go_to_next_audio_file()
+            if audio_position < 0 and self.current_audio_idx > 0:
+                self.go_to_previous_audio_file()
         
         # if playing:
         #     self.toggle_play()
@@ -115,13 +119,29 @@ class AudioPlayer():
         self.playback.play()
 
         while not self.playback.get_pause():
+            if self.end_audio_thread:
+                print("ending thread")
+                self.end_audio_thread = False
+                break
+
+            
+            if self.eof_reached:
+                self.eof_reached = False
+                self.disable_auto_slider = True
+                self.go_to_next_audio_file()
+                break # end this thread
+
             time.sleep(0.1)
+
             if not self.disable_auto_slider:
                 self.current_audio_position = self.playback.get_pts()
                 # see if the page should be turned based on the current audio position
                 file_time = self.sync_script.file_time_from_bookpos(self.sync_script.end_page_bookpos)
                 NEXT_PAGE_LEEWAY = 5 # WARNING HACK
-                if file_time[1] + NEXT_PAGE_LEEWAY < self.current_audio_position:
+                time_diff_to_page_turn = file_time[1] + NEXT_PAGE_LEEWAY - self.start_time
+                time_diff_from_start = (self.current_audio_position - self.start_time) * self.playback_speed
+                print(time_diff_to_page_turn, time_diff_from_start)
+                if time_diff_from_start > time_diff_to_page_turn:
                     # need to make sure it only turns the page once!
                     Clock.schedule_once(lambda dt: self.sync_script.reader_window.next_page())
                     time.sleep(1)
