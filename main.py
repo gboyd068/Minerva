@@ -114,8 +114,8 @@ class MinervaApp(MDApp):
         self.exit_manager()
         print(glob.glob(os.path.join(path, "*"), recursive=True))
         self.config.set('General', 'library_path', path)
-        self.root.ids.library_screen.library_path = path
-        self.root.ids.library_screen.load_library()
+        self.root.library_screen.library_path = path
+        self.root.library_screen.load_library()
         toast(path)
 
     def exit_manager(self, *args):
@@ -143,29 +143,29 @@ class MinervaApp(MDApp):
             self.theme_cls.theme_style = value 
         if key == "text_margin":
             value = int(value)
-            self.root.ids.player_screen.ids.reader_window.padding = (value, value)
-            self.root.ids.player_screen.ids.reader_window.display_page()
+            self.root.player_screen.reader_window.padding = (value, value)
+            self.root.player_screen.reader_window.display_page()
         if key == "font_size":
             value = int(value)
-            self.root.ids.player_screen.ids.reader_window.font_size = value
-            self.root.ids.player_screen.ids.reader_window.display_page()
+            self.root.player_screen.reader_window.font_size = value
+            self.root.player_screen.reader_window.display_page()
         if key == "library_path":
-            self.root.ids.library_screen.library_path = value
-            self.root.ids.library_screen.load_library()
+            self.root.library_screen.library_path = value
+            self.root.library_screen.load_library()
         if key == "playback_speed":
-            audio_player = self.root.ids.player_screen.audio_player
+            audio_player = self.root.player_screen.audio_player
             audio_player.playback_speed = float(value)
             if audio_player.playback is not None and audio_player.current_audio_idx is not None:
                 audio_player.load_audio_file(audio_player.current_audio_idx, audio_player.current_audio_position)
 
     def save_current_book_location(self):
-        audio_player = self.root.ids.player_screen.audio_player
+        audio_player = self.root.player_screen.audio_player
         if audio_player.playback is not None:
             audio_player.save_last_played_timestamp()
 
     def on_stop(self): # only gets called on desktop, android doesn't call this (don't know about ios)
         self.save_current_book_location()
-        audio_player = self.root.ids.player_screen.audio_player
+        audio_player = self.root.player_screen.audio_player
         audio_player.disable_saving = True
         if audio_player.playback is not None:
             audio_player.playback.pause()

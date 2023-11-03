@@ -52,14 +52,14 @@ class AudioPlayer():
 
 
     def load_audio_file(self, audio_file_idx, start_time=0):
-        # FUCK THIS IS CALLED FROM AUDIO_PLAY_THREAD
+        # FUCK THIS IS CALLED FROM AUDIO_PLAY_THREAD USUALLY BUT MAY BE CALLED FROM ELSEWHERE!
         print("loading audio file")
         self.start_time  = start_time
         self.current_audio_idx = audio_file_idx
         self.playback = Playback(filename=self.audio_filenames[self.current_audio_idx], callback=self.audio_callback, ff_opts={'af': f'atempo={self.playback_speed}','ss': start_time, 'vn': True})
-        if self.playing:
-            self.audio_thread = threading.Thread(target=self.audio_play_thread)
-            self.audio_thread.start()
+        # if self.playing:
+        #     self.audio_thread = threading.Thread(target=self.audio_play_thread)
+        #     self.audio_thread.start()
         self.current_audio_position = start_time
 
     def go_to_audio_file_position(self, audio_file_idx, audio_position, sync=True):
