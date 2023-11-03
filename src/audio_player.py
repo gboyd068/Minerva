@@ -56,7 +56,7 @@ class AudioPlayer():
         print("loading audio file")
         self.start_time  = start_time
         self.current_audio_idx = audio_file_idx
-        self.playback = Playback(filename=self.audio_filenames[self.current_audio_idx], callback=self.audio_callback, ff_opts={'af': 'atempo=1.0','ss': start_time, 'vn': True})
+        self.playback = Playback(filename=self.audio_filenames[self.current_audio_idx], callback=self.audio_callback, ff_opts={'af': f'atempo={self.playback_speed}','ss': start_time, 'vn': True})
         if self.playing:
             self.audio_thread = threading.Thread(target=self.audio_play_thread)
             self.audio_thread.start()
