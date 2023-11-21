@@ -136,15 +136,16 @@ class AudioPlayer():
             if not self.disable_auto_slider:
                 self.current_audio_position = self.playback.get_pts()
                 # see if the page should be turned based on the current audio position
-                file_time = self.sync_script.file_time_from_bookpos(self.sync_script.end_page_bookpos)
-                NEXT_PAGE_LEEWAY = 5 # WARNING HACK
-                time_diff_to_page_turn = file_time[1] + NEXT_PAGE_LEEWAY - self.start_time
-                time_diff_from_start = (self.current_audio_position - self.start_time) * self.playback_speed
-                print(time_diff_to_page_turn, time_diff_from_start)
-                if time_diff_from_start > time_diff_to_page_turn:
-                    # need to make sure it only turns the page once!
-                    Clock.schedule_once(lambda dt: self.sync_script.reader_window.next_page())
-                    time.sleep(1)
+                if self.sync_script.auto_page_turn_enabled:
+                    file_time = self.sync_script.file_time_from_bookpos(self.sync_script.end_page_bookpos)
+                    NEXT_PAGE_LEEWAY = 5 # WARNING HACK
+                    time_diff_to_page_turn = file_time[1] + NEXT_PAGE_LEEWAY - self.start_time
+                    time_diff_from_start = (self.current_audio_position - self.start_time) * self.playback_speed
+                    print(time_diff_to_page_turn, time_diff_from_start)
+                    if time_diff_from_start > time_diff_to_page_turn:
+                        # need to make sure it only turns the page once!
+                        Clock.schedule_once(lambda dt: self.sync_script.reader_window.next_page())
+                        time.sleep(1)
                 Clock.schedule_once(self.set_slider_value)
                 self.save_last_played_timestamp()
 

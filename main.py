@@ -132,6 +132,7 @@ class MinervaApp(MDApp):
         config.setdefault('General','font_size', 40)
         config.setdefault('General','skip_size', 30)
         config.setdefault('General','playback_speed', 1.0)
+        config.setdefault('General','auto_page_turn', True)
 
     def build_settings(self, settings):
         settings.add_json_panel('General', self.config, data=settings_json)
@@ -157,6 +158,8 @@ class MinervaApp(MDApp):
             audio_player.playback_speed = float(value)
             if audio_player.playback is not None and audio_player.current_audio_idx is not None:
                 audio_player.load_audio_file(audio_player.current_audio_idx, audio_player.current_audio_position)
+        if key == "auto_page_turn":
+            self.root.player_screen.sync_script.auto_page_turn_enabled = not value=="0"
 
     def save_current_book_location(self):
         audio_player = self.root.player_screen.audio_player

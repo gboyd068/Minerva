@@ -17,13 +17,11 @@ settings_json = json.dumps([{ "type": "title", "title": "General" },
                             "key": "theme",
                             "options": ["Light", "Dark"]},
 
-                            # { "type": "bool",
-                            # "title": "Setting 1",
-                            # "desc": "Description of setting 1",
-                            # "section": "General",
-                            # "key": "boolexample" },
-
-                            
+                            { "type": "bool",
+                            "title": "Auto Page Turn",
+                            "desc": "Enables automatic page turning when audio reaches the end of the page",
+                            "section": "General",
+                            "key": "auto_page_turn" },
 
                             { "type": "title", "title": "Audio" },
 
@@ -41,6 +39,7 @@ settings_json = json.dumps([{ "type": "title", "title": "General" },
                             "desc": "Time Skipped by Skip Buttons (seconds)",
                             "section": "General",
                             "key": "skip_size" },
+
 
                             { "type": "title", "title": "Text" },
 

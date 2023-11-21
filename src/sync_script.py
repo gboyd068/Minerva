@@ -21,6 +21,8 @@ class SyncScript():
         self.audio_file_start_times = []
         self.end_page_bookpos = None
         self.sync_data_path = None
+        self.auto_page_turn_enabled = not "0"==MDApp.get_running_app().config.get("General", "auto_page_turn")
+
 
     def update_end_page_bookpos(self, bookpos):
         self.end_page_bookpos = bookpos
