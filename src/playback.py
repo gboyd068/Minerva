@@ -25,6 +25,8 @@ if __name__ == "__main__":
     file = r"C:\Users\obion\Documents\projects\audiobookplayer\alloy\audio\alloy9.mp3"
     playback_speed = 1
     player = Playback(filename=file, thread_lib="python", callback=callback_func, ff_opts={'ss':500., 't':500., 'af': f'atempo={playback_speed}'}) # allowed playback from 0.5 to 100
+    playing = not player.get_pause()
+    print(playing)
     print(player.duration)
     print(player.get_pts())
     player.play()

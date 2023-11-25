@@ -40,15 +40,16 @@ class AudioPlayer():
         self.audio_filenames = glob.glob(os.path.join(audio_path, "*.mp3"))
         book_dir_name = str(pathlib.Path(audio_path).parents[0])
         user_data_dir = MDApp.get_running_app().user_data_dir
-        self.timestamp_path = os.path.join(user_data_dir, book_dir_name, "last_played_timestamp.json")
+        self.timestamp_path = os.path.join(user_data_dir, book_dir_name,
+                                           "last_played_timestamp.json")
 
-    def audio_callback(self, selector,value):
-            if selector == "read:exit":
-                Clock.schedule_once(self.set_slider_value)
-            if selector == "eof":
-                print("eof")
-                self.playback.pause()
-                self.eof_reached = True
+    def audio_callback(self, selector, value):
+        if selector == "read:exit":
+            Clock.schedule_once(self.set_slider_value)
+        if selector == "eof":
+            print("eof")
+            # self.playback.pause()
+            self.eof_reached = True
 
 
     def load_audio_file(self, audio_file_idx, start_time=0):
@@ -56,7 +57,11 @@ class AudioPlayer():
         print("loading audio file")
         self.start_time  = start_time
         self.current_audio_idx = audio_file_idx
-        self.playback = Playback(filename=self.audio_filenames[self.current_audio_idx], callback=self.audio_callback, ff_opts={'af': f'atempo={self.playback_speed}','ss': start_time, 'vn': True})
+        self.playback = Playback(filename=self.audio_filenames[self.current_audio_idx],
+                                  callback=self.audio_callback,
+                                  ff_opts={'af': f'atempo={self.playback_speed}',
+                                           'ss': start_time, 
+                                           'vn': True})
         # if self.playing:
         #     self.audio_thread = threading.Thread(target=self.audio_play_thread)
         #     self.audio_thread.start()
@@ -81,19 +86,19 @@ class AudioPlayer():
                 self.go_to_next_audio_file()
             if audio_position < 0 and self.current_audio_idx > 0:
                 self.go_to_previous_audio_file()
-        
+
         # if playing:
         #     self.toggle_play()
 
         if sync:
             self.sync_script.sync_to_audio_position()
         self.disable_auto_slider = False
-            
-    
+
+
     def go_to_next_audio_file(self):
         if self.current_audio_idx < len(self.audio_filenames) - 2:
             self.go_to_audio_file_position(self.current_audio_idx + 1, 0)
-    
+
     def go_to_previous_audio_file(self):
         if self.current_audio_idx > 0:
             self.go_to_audio_file_position(self.current_audio_idx - 1, 0)
@@ -124,7 +129,7 @@ class AudioPlayer():
                 self.end_audio_thread = False
                 break
 
-            
+
             if self.eof_reached:
                 self.eof_reached = False
                 self.disable_auto_slider = True
@@ -159,7 +164,7 @@ class AudioPlayer():
         if abs(new_audio_position - self.current_audio_position) > 1:
             self.go_to_audio_file_position(self.current_audio_idx, new_audio_position)
         self.disable_auto_slider = False
-        
+
 
     def save_last_played_timestamp(self):
         if self.disable_saving:
@@ -183,3 +188,4 @@ class AudioPlayer():
                 self.go_to_audio_file_position(audio_index, audio_position)
         except (FileNotFoundError, JSONDecodeError):
             self.go_to_audio_file_position(0, 0)
+            
