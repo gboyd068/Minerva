@@ -24,7 +24,7 @@ class PlayerScreen(Screen):
         Clock.schedule_once(self._finish_init)
 
     def _finish_init(self, dt):
-        reader_window = self.ids.reader_window
+        reader_window = self.reader_window
         # make audio player and sync script members of the player screen so kivy can access them
         self.audio_player = AudioPlayer()
         self.sync_script = SyncScript(self.audio_player, reader_window)

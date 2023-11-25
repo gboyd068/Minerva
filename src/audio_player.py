@@ -28,7 +28,7 @@ class AudioPlayer():
         self.eof_reached = False
         self.playback_speed = float(MDApp.get_running_app().config.get("General", "playback_speed"))
         Clock.schedule_once(self._finish_init)
-    
+
     def _finish_init(self, dt):
         # get a reference for the slider so sync script can update it
         app = MDApp.get_running_app()
