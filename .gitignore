@@ -4,5 +4,9 @@ icon_viewer.py
 politics_on_the_edge
 EoTW
 .buildozer
+<<<<<<< Updated upstream
+
+
+=======
 bin
-__pycache__
+>>>>>>> Stashed changes
