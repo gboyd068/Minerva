@@ -4,3 +4,5 @@ icon_viewer.py
 politics_on_the_edge
 EoTW
 .buildozer
+bin
+__pycache__
