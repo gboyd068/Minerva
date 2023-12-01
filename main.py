@@ -173,6 +173,21 @@ class MinervaApp(MDApp):
         if audio_player.playback is not None:
             audio_player.playback.pause()
 
+    def on_pause(self):
+        self.save_current_book_location()
+        audio_player = self.root.player_screen.audio_player
+        audio_player.disable_saving = True
+        if audio_player.playback is not None:
+            audio_player.playback.pause()
+        return True
+    
+    def on_resume(self):
+        audio_player = self.root.player_screen.audio_player
+        audio_player.disable_saving = False
+        return True
+
+    
+
 
 if __name__ == "__main__":
     MinervaApp().run()
