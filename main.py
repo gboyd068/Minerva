@@ -61,30 +61,30 @@ class MinervaApp(MDApp):
     def permissions_external_storage(self, *args):                  
         if platform == "android":
             self.primary_ext_storage = primary_external_storage_path()
-            PythonActivity = autoclass("org.kivy.android.PythonActivity")
-            Environment = autoclass("android.os.Environment")
-            Intent = autoclass("android.content.Intent")
-            Settings = autoclass("android.provider.Settings")
-            Uri = autoclass("android.net.Uri")
+            self.PythonActivity = autoclass("org.kivy.android.PythonActivity")
+            self.Environment = autoclass("android.os.Environment")
+            self.Intent = autoclass("android.content.Intent")
+            self.Settings = autoclass("android.provider.Settings")
+            self.Uri = autoclass("android.net.Uri")
                 # If you have access to the external storage, do whatever you need
-            if Environment.isExternalStorageManager():
+            if self.Environment.isExternalStorageManager():
                 # If you don't have access, launch a new activity to show the user the system's dialog
                 # to allow access to the external storage
                 pass
             else:
                 try:
-                    activity = PythonActivity.mActivity.getApplicationContext()
-                    uri = Uri.parse("package:" + activity.getPackageName())
-                    intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri)
+                    activity = self.PythonActivity.mActivity.getApplicationContext()
+                    uri = self.Uri.parse("package:" + activity.getPackageName())
+                    intent = self.Intent(self.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, uri)
                     currentActivity = cast(
-                    "android.app.Activity", PythonActivity.mActivity
+                    "android.app.Activity", self.PythonActivity.mActivity
                     )
                     currentActivity.startActivityForResult(intent, 101)
                 except:
-                    intent = Intent()
-                    intent.setAction(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                    intent = self.Intent()
+                    intent.setAction(self.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
                     currentActivity = cast(
-                    "android.app.Activity", PythonActivity.mActivity
+                    "android.app.Activity", self.PythonActivity.mActivity
                     )
                     currentActivity.startActivityForResult(intent, 101)
 
@@ -174,6 +174,7 @@ class MinervaApp(MDApp):
             audio_player.playback.pause()
 
     def on_pause(self):
+        # PROBABLY NEED TO CHANGE THIS AS IT WOULD DISABLE SAVING WHEN APP MINIMISED
         self.save_current_book_location()
         audio_player = self.root.player_screen.audio_player
         audio_player.disable_saving = True
