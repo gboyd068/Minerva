@@ -96,7 +96,7 @@ class AudioPlayer():
 
 
     def go_to_next_audio_file(self):
-        if self.current_audio_idx < len(self.audio_filenames) - 2:
+        if self.current_audio_idx < len(self.audio_filenames) - 1:
             self.go_to_audio_file_position(self.current_audio_idx + 1, 0)
 
     def go_to_previous_audio_file(self):
@@ -143,11 +143,13 @@ class AudioPlayer():
                 # see if the page should be turned based on the current audio position
                 if self.sync_script.auto_page_turn_enabled:
                     file_time = self.sync_script.file_time_from_bookpos(self.sync_script.end_page_bookpos)
+                    file_index = file_time[0]
                     NEXT_PAGE_LEEWAY = 5 # WARNING HACK
+                    # doesn't work at the boundaries of audio files!!
                     time_diff_to_page_turn = file_time[1] + NEXT_PAGE_LEEWAY - self.start_time
                     time_diff_from_start = (self.current_audio_position - self.start_time) * self.playback_speed
                     print(time_diff_to_page_turn, time_diff_from_start)
-                    if time_diff_from_start > time_diff_to_page_turn:
+                    if time_diff_from_start > time_diff_to_page_turn and file_index == self.current_audio_idx:
                         # need to make sure it only turns the page once!
                         Clock.schedule_once(lambda dt: self.sync_script.reader_window.next_page())
                         time.sleep(1)
