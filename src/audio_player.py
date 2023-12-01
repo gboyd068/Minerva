@@ -136,23 +136,22 @@ class AudioPlayer():
                     self.disable_auto_slider = True
                     self.go_to_next_audio_file()
 
-                
-
-                if not self.disable_auto_slider:
+                if not self.playback.get_pause():
                     self.current_audio_position = self.playback.get_pts()
-                    # see if the page should be turned based on the current audio position
-                    if self.sync_script.auto_page_turn_enabled and not self.playback.get_pause():
-                        file_time = self.sync_script.file_time_from_bookpos(self.sync_script.end_page_bookpos)
-                        file_index = file_time[0]
-                        NEXT_PAGE_LEEWAY = 5 # WARNING HACK
-                        time_diff_to_page_turn = file_time[1] + NEXT_PAGE_LEEWAY - self.start_time
-                        time_diff_from_start = (self.current_audio_position - self.start_time) * self.playback_speed
-                        print(time_diff_to_page_turn, time_diff_from_start)
-                        if time_diff_from_start > time_diff_to_page_turn and file_index == self.current_audio_idx:
-                            Clock.schedule_once(lambda dt: self.sync_script.reader_window.next_page())
-                            time.sleep(1) # make sure it only turns the page once
-                    Clock.schedule_once(self.set_slider_value)
-                    
+                    if not self.disable_auto_slider:
+                        # see if the page should be turned based on the current audio position
+                        if self.sync_script.auto_page_turn_enabled and not self.playback.get_pause():
+                            file_time = self.sync_script.file_time_from_bookpos(self.sync_script.end_page_bookpos)
+                            file_index = file_time[0]
+                            NEXT_PAGE_LEEWAY = 5 # WARNING HACK
+                            time_diff_to_page_turn = file_time[1] + NEXT_PAGE_LEEWAY - self.start_time
+                            time_diff_from_start = (self.current_audio_position - self.start_time) * self.playback_speed
+                            print(time_diff_to_page_turn, time_diff_from_start)
+                            if time_diff_from_start > time_diff_to_page_turn and file_index == self.current_audio_idx:
+                                Clock.schedule_once(lambda dt: self.sync_script.reader_window.next_page())
+                                time.sleep(1) # make sure it only turns the page once
+                        Clock.schedule_once(self.set_slider_value)
+
                 self.save_last_played_timestamp()
 
     def set_slider_value(self, dt=None):
@@ -172,7 +171,7 @@ class AudioPlayer():
             return
         try:
             timestamp = {"audio_file_idx": self.current_audio_idx,
-                         "audio_position": self.playback.get_pts()}
+                         "audio_position": self.current_audio_position}
             if not os.path.exists(os.path.dirname(self.timestamp_path)):
                 os.makedirs(os.path.dirname(self.timestamp_path))
             with open(self.timestamp_path, "w+") as file:
