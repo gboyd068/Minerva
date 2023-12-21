@@ -66,10 +66,10 @@ class MinervaApp(MDApp):
             Clock.schedule_once(self.file_manager_open)
         if platform == "android":
             context =  mActivity.getApplicationContext()
-            service_name = str(context.getPackageName()) + '.Service' + "AudioService"
+            service_name = str(context.getPackageName()) + '.Service' + "Audioservice"
             service = autoclass(service_name)
             service.start(mActivity,'')   # starts or re-initializes a service
-            
+
         return kv
     
 
