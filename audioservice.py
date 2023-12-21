@@ -105,7 +105,7 @@ def service_thread(app_port, service_port):
     while True:
         # need to manage callbacks from playback
         time.sleep(0.1)
-        service_manager.status_message()
+        # service_manager.status_message()
         
 
 service_thread(8000, 8001)
