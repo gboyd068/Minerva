@@ -69,7 +69,10 @@ class MinervaApp(MDApp):
             service_name = str(context.getPackageName()) + '.Service' + "Audioservice"
             print("ATTEMPTING TO START SERVICE: ", service_name)
             service = autoclass(service_name)
-            service.start(mActivity,'')   # starts or re-initializes a service
+            self.mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
+            argument = ''
+            service.start(self.mActivity, argument)
+            self.service = service
 
         return kv
     
