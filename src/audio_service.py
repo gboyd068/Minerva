@@ -102,5 +102,4 @@ def service_thread(app_port, service_port):
         service_manager.status_message()
         
 if platform == "android":
-    if __name__ == "__main__":
         service_thread(8000, 8001)
