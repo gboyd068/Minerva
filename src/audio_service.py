@@ -1,7 +1,6 @@
 from oscpy.server import OSCThreadServer
 from src.playback import Playback
 import time
-from kivy.utils import platform 
 from functools import partial
 
 
@@ -102,5 +101,4 @@ def service_thread(app_port, service_port):
         service_manager.status_message()
         
 if __name__ == "__main__":
-    if platform == "android":
-        service_thread(8000, 8001)
+    service_thread(8000, 8001)
