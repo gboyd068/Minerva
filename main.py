@@ -67,6 +67,7 @@ class MinervaApp(MDApp):
         if platform == "android":
             context =  mActivity.getApplicationContext()
             service_name = str(context.getPackageName()) + '.Service' + "Audioservice"
+            print("ATTEMPTING TO START SERVICE: ", service_name)
             service = autoclass(service_name)
             service.start(mActivity,'')   # starts or re-initializes a service
 

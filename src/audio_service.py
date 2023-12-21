@@ -94,12 +94,13 @@ def load_audio_file(service_manager, *values):
 
 
 def service_thread(app_port, service_port):
-    print("starting service")
+    print("STARTING SERVICE")
     service_manager = ServiceManagaer(app_port, service_port)
     while True:
         # need to manage callbacks from playback
         time.sleep(0.1)
         service_manager.status_message()
         
-if platform == "android":
+if __name__ == "__main__":
+    if platform == "android":
         service_thread(8000, 8001)
