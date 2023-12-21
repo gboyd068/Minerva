@@ -64,16 +64,6 @@ class MinervaApp(MDApp):
         self.theme_cls.theme_style = self.config.get('General', 'theme')
         if self.config.get('General', 'library_path') == "None":
             Clock.schedule_once(self.file_manager_open)
-        if platform == "android":
-            context =  mActivity.getApplicationContext()
-            service_name = str(context.getPackageName()) + '.Service' + "Audioservice"
-            print("ATTEMPTING TO START SERVICE: ", service_name)
-            service = autoclass(service_name)
-            self.mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
-            argument = ''
-            service.start(self.mActivity, argument)
-            self.service = service
-
         return kv
     
 

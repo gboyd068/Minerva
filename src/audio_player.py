@@ -49,6 +49,18 @@ class AudioPlayer():
         # start the service thread, should be a service on android
         if platform != "android":
             threading.Thread(target=service_thread, args=(self.app_port, self.service_port), daemon=True).start()
+        if platform == "android":
+            from jnius import autoclass
+            from jnius import cast
+            from android import mActivity
+            context =  mActivity.getApplicationContext()
+            service_name = str(context.getPackageName()) + '.Service' + "Audioservice"
+            print("ATTEMPTING TO START SERVICE: ", service_name)
+            service = autoclass(service_name)
+            self.mActivity = autoclass('org.kivy.android.PythonActivity').mActivity
+            argument = ''
+            service.start(self.mActivity, argument)
+            self.service = service
 
 
     def _finish_init(self, dt):
