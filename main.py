@@ -13,7 +13,7 @@ from kivy.clock import Clock
 if platform == "android":
     from jnius import autoclass
     from jnius import cast
-    from android import activity
+    from android import activity, mActivity
     from android.storage import primary_external_storage_path
 
 from src.library_screen import LibraryScreen
@@ -64,8 +64,16 @@ class MinervaApp(MDApp):
         self.theme_cls.theme_style = self.config.get('General', 'theme')
         if self.config.get('General', 'library_path') == "None":
             Clock.schedule_once(self.file_manager_open)
+        if platform == "android":
+            context =  mActivity.getApplicationContext()
+            service_name = str(context.getPackageName()) + '.Service' + "AudioService"
+            service = autoclass(service_name)
+            service.start(mActivity,'')   # starts or re-initializes a service
+            
         return kv
-        
+    
+
+
 
     def permissions_external_storage(self, *args):                  
         if platform == "android":

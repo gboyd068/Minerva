@@ -6,6 +6,7 @@ import threading
 import time
 from kivymd.app import MDApp
 from kivy.clock import Clock
+from kivy.utils import platform
 from json import JSONDecodeError
 from oscpy.server import OSCThreadServer
 from src.audio_service import service_thread
@@ -45,7 +46,8 @@ class AudioPlayer():
         self.osc.bind(b'/status', self.status_update)
 
         # start the service thread, should be a service on android
-        threading.Thread(target=service_thread, args=(self.app_port, self.service_port), daemon=True).start()
+        if platform != "android":
+            threading.Thread(target=service_thread, args=(self.app_port, self.service_port), daemon=True).start()
 
 
     def _finish_init(self, dt):
