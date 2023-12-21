@@ -62,7 +62,8 @@ class AudioPlayer():
         self.duration = float(values[2])
 
         # update slider
-        Clock.schedule_once(self.set_slider_value)
+        if not self.disable_auto_slider:
+            Clock.schedule_once(self.set_slider_value)
 
         # update play/pause button
 
@@ -89,7 +90,7 @@ class AudioPlayer():
         # get a reference for the slider so sync script can update it
         app = MDApp.get_running_app()
         self.slider = app.root.player_screen.audio_slider
-        self.slider.bind(value=self.on_slider_value_change)
+        self.slider.bind(on_touch_up=self.on_slider_value_change)
         self.sync_script = app.root.player_screen.sync_script
 
     def load_audio_path(self, audio_path):
@@ -196,12 +197,14 @@ class AudioPlayer():
         self.slider.value = self.current_audio_position / self.duration
 
     def on_slider_value_change(self, instance, value):
-        self.disable_auto_slider = True
-        # Calculate the new audio position based on the slider value
-        new_audio_position = value * self.duration
-        if abs(new_audio_position - self.current_audio_position) > 1:
-            self.go_to_audio_file_position(self.current_audio_idx, new_audio_position)
-        self.disable_auto_slider = False
+            # want this to only be on manual changes!
+            self.disable_auto_slider = True
+            pos = self.slider.value
+            # Calculate the new audio position based on the slider value
+            new_audio_position = pos * self.duration
+            if abs(new_audio_position - self.current_audio_position) > 1:
+                self.go_to_audio_file_position(self.current_audio_idx, new_audio_position)
+            self.disable_auto_slider = False
 
 
     def save_last_played_timestamp(self):
