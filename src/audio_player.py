@@ -9,7 +9,7 @@ from kivymd.app import MDApp
 from kivy.clock import Clock
 from json import JSONDecodeError
 from oscpy.server import OSCThreadServer
-from src.service import service_thread
+from src.audio_service import service_thread
  
 class AudioPlayer():
     def __init__(self, audio_path=None):
@@ -35,7 +35,7 @@ class AudioPlayer():
         self.playback_speed = float(MDApp.get_running_app().config.get("General", "playback_speed"))
         Clock.schedule_once(self._finish_init)
 
-        # TESTING OF OSC
+        # OSC
         self.osc = None
         self.app_port = 8000
         self.service_port = 8001
@@ -43,8 +43,12 @@ class AudioPlayer():
         self.osc.listen(address='localhost', port=self.app_port, default=True)
         # use osc addresses to determine which function to callback
         self.osc.bind(b'/status', self.print_status)
+
+        # start the service thread, should be a service on android
         threading.Thread(target=service_thread, args=(self.app_port, self.service_port), daemon=True).start()
 
+    def send_message(self, address, values):
+        self.osc.send_message(address, values, 'localhost', self.service_port)
 
     def print_status(self, *values):
         print('Client received  message: ', values)
