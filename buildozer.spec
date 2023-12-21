@@ -54,7 +54,7 @@ requirements = python3,kivy,kivymd,pillow,androidstorage4kivy,oscpy,ffmpeg,ffpyp
 orientation = portrait
 
 # (list) List of service to declare
-services = Audioservice:audioservice.py
+services = Audioservice:audioservice.py:foreground
 
 #
 # OSX Specific
@@ -96,7 +96,7 @@ fullscreen = 0
 # (list) Permissions
 # (See https://python-for-android.readthedocs.io/en/latest/buildoptions/#build-options-1 for all the supported syntaxes and properties)
 #android.permissions = android.permission.INTERNET, (name=android.permission.WRITE_EXTERNAL_STORAGE;maxSdkVersion=18)
-android.permissions = READ_MEDIA_IMAGES, READ_MEDIA_VIDEO, READ_MEDIA_AUDIO, READ_EXTERNAL_STORAGE,MANAGE_EXTERNAL_STORAGE, INTERNET
+android.permissions = READ_MEDIA_IMAGES, READ_MEDIA_VIDEO, READ_MEDIA_AUDIO, READ_EXTERNAL_STORAGE,MANAGE_EXTERNAL_STORAGE, INTERNET, FOREGROUND_SERVICE
 
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host
