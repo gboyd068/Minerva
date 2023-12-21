@@ -165,7 +165,7 @@ class MinervaApp(MDApp):
 
     def save_current_book_location(self):
         audio_player = self.root.player_screen.audio_player
-        if audio_player.playback is not None:
+        if audio_player.is_audio_loaded:
             audio_player.save_last_played_timestamp()
 
     def on_stop(self): # only gets called on desktop, android doesn't call this (don't know about ios)

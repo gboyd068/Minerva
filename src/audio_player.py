@@ -197,7 +197,7 @@ class AudioPlayer():
         self.slider.value = self.current_audio_position / self.duration
 
     def on_slider_value_change(self, instance, value):
-            # want this to only be on manual changes!
+            print("manually changing slider")
             self.disable_auto_slider = True
             pos = self.slider.value
             # Calculate the new audio position based on the slider value
