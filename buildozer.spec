@@ -37,7 +37,7 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3,kivy,kivymd,pillow,androidstorage4kivy,ffmpeg,ffpyplayer,ffpyplayer_codecs,pysrt,ebooklib,beautifulsoup4, chardet, soupsieve,lxml,six,plyer
+requirements = python3,kivy,kivymd,pillow,androidstorage4kivy,oscpy,ffmpeg,ffpyplayer,ffpyplayer_codecs,pysrt,ebooklib,beautifulsoup4, chardet, soupsieve,lxml,six,plyer
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
@@ -96,7 +96,7 @@ fullscreen = 0
 # (list) Permissions
 # (See https://python-for-android.readthedocs.io/en/latest/buildoptions/#build-options-1 for all the supported syntaxes and properties)
 #android.permissions = android.permission.INTERNET, (name=android.permission.WRITE_EXTERNAL_STORAGE;maxSdkVersion=18)
-android.permissions = READ_MEDIA_IMAGES, READ_MEDIA_VIDEO, READ_MEDIA_AUDIO, READ_EXTERNAL_STORAGE,MANAGE_EXTERNAL_STORAGE
+android.permissions = READ_MEDIA_IMAGES, READ_MEDIA_VIDEO, READ_MEDIA_AUDIO, READ_EXTERNAL_STORAGE,MANAGE_EXTERNAL_STORAGE, NETWORK
 
 # (list) features (adds uses-feature -tags to manifest)
 #android.features = android.hardware.usb.host

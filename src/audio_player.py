@@ -8,6 +8,8 @@ from src.playback import Playback
 from kivymd.app import MDApp
 from kivy.clock import Clock
 from json import JSONDecodeError
+from oscpy.server import OSCThreadServer
+from src.service import service_thread
  
 class AudioPlayer():
     def __init__(self, audio_path=None):
@@ -32,6 +34,21 @@ class AudioPlayer():
 
         self.playback_speed = float(MDApp.get_running_app().config.get("General", "playback_speed"))
         Clock.schedule_once(self._finish_init)
+
+        # TESTING OF OSC
+        self.osc = None
+        self.app_port = 8000
+        self.service_port = 8001
+        self.osc = OSCThreadServer()
+        self.osc.listen(address='localhost', port=self.app_port, default=True)
+        # use osc addresses to determine which function to callback
+        self.osc.bind(b'/status', self.print_status)
+        threading.Thread(target=service_thread, args=(self.app_port, self.service_port), daemon=True).start()
+
+
+    def print_status(self, *values):
+        print('Client received  message: ', values)
+        # bools are converted to ints!
 
     def _finish_init(self, dt):
         # get a reference for the slider so sync script can update it
