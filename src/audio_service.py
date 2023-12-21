@@ -94,6 +94,7 @@ def load_audio_file(service_manager, *values):
 
 
 def service_thread(app_port, service_port):
+    print("starting service")
     service_manager = ServiceManagaer(app_port, service_port)
     while True:
         # need to manage callbacks from playback
