@@ -172,16 +172,16 @@ class MinervaApp(MDApp):
         self.save_current_book_location()
         audio_player = self.root.player_screen.audio_player
         audio_player.disable_saving = True
-        if audio_player.playback is not None:
-            audio_player.playback.pause()
+        if audio_player.is_audio_loaded:
+            audio_player.pause()
 
     def on_pause(self):
         # PROBABLY NEED TO CHANGE THIS AS IT WOULD DISABLE SAVING WHEN APP MINIMISED
         self.save_current_book_location()
         audio_player = self.root.player_screen.audio_player
         audio_player.disable_saving = True
-        if audio_player.playback is not None:
-            audio_player.playback.pause()
+        if audio_player.is_audio_loaded:
+            audio_player.pause()
         return True
     
     def on_resume(self):
