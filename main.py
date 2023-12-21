@@ -15,7 +15,7 @@ if platform == "android":
     from jnius import cast
     from android import activity
     from android.storage import primary_external_storage_path
-    
+
 from src.library_screen import LibraryScreen
 from src.player_screen import PlayerScreen
 from settingsjson import settings_json
@@ -157,9 +157,11 @@ class MinervaApp(MDApp):
             self.root.library_screen.load_library()
         if key == "playback_speed":
             audio_player = self.root.player_screen.audio_player
+            audio_player.enable_status_update = False
             audio_player.playback_speed = float(value)
-            if audio_player.playback is not None and audio_player.current_audio_idx is not None:
+            if audio_player.is_audio_loaded and audio_player.current_audio_idx is not None:
                 audio_player.load_audio_file(audio_player.current_audio_idx, audio_player.current_audio_position)
+            audio_player.enable_status_update = True
         if key == "auto_page_turn":
             self.root.player_screen.sync_script.auto_page_turn_enabled = not value=="0"
 

@@ -20,7 +20,7 @@ class AudioPlayer():
         self.disable_saving = False
         self.is_playing = False
         self.is_audio_loaded = False
-        self.disable_auto_slider = False
+        self.enable_status_update = False
         self.start_time = 0
         self.duration = None
         self.slider = None
@@ -64,33 +64,33 @@ class AudioPlayer():
         called when status is updated from the service
         values = (current_audio_position: float, is_playing: int, duration: float)
         """
-        # print('Client received  status: ', values)
-        self.is_playing = bool(values[1])
-        if self.is_playing:
-            self.current_audio_position = float(values[0])
-        self.duration = float(values[2])
+        if self.enable_status_update:
+            self.is_playing = bool(values[1])
+            if self.is_playing:
+                self.current_audio_position = float(values[0])
+            self.duration = float(values[2])
 
-        # update slider
-        # if not self.disable_auto_slider and self.is_playing:
-        #     Clock.schedule_once(self.set_slider_value)
+            # update slider
+            # if not self.disable_auto_slider and self.is_playing:
+            #     Clock.schedule_once(self.set_slider_value)
 
-        # update play/pause button
+            # update play/pause button
 
-        # turn page if required
-        if self.sync_script.auto_page_turn_enabled and self.is_playing:
-            file_time = self.sync_script.file_time_from_bookpos(self.sync_script.end_page_bookpos)
-            file_index = file_time[0]
-            NEXT_PAGE_LEEWAY = 5 # WARNING HACK
-            time_diff_to_page_turn = file_time[1] + NEXT_PAGE_LEEWAY - self.start_time
-            time_diff_from_start = (self.current_audio_position - self.start_time) * self.playback_speed
-            print(time_diff_to_page_turn, time_diff_from_start)
-            if time_diff_from_start > time_diff_to_page_turn and file_index == self.current_audio_idx:
-                Clock.schedule_once(lambda dt: self.sync_script.reader_window.next_page())
-                # time.sleep(1)
-                # might need to adjust this to make sure page turn only happens once
+            # turn page if required
+            if self.sync_script.auto_page_turn_enabled and self.is_playing:
+                file_time = self.sync_script.file_time_from_bookpos(self.sync_script.end_page_bookpos)
+                file_index = file_time[0]
+                NEXT_PAGE_LEEWAY = 5 # WARNING HACK
+                time_diff_to_page_turn = file_time[1] + NEXT_PAGE_LEEWAY - self.start_time
+                time_diff_from_start = (self.current_audio_position - self.start_time) * self.playback_speed
+                print(time_diff_to_page_turn, time_diff_from_start)
+                if time_diff_from_start > time_diff_to_page_turn and file_index == self.current_audio_idx:
+                    Clock.schedule_once(lambda dt: self.sync_script.reader_window.next_page())
+                    # time.sleep(1)
+                    # might need to adjust this to make sure page turn only happens once
 
-        # save timestamp
-        self.save_last_played_timestamp()
+            # save timestamp
+            self.save_last_played_timestamp()
 
 
     def load_audio_path(self, audio_path):
@@ -117,7 +117,6 @@ class AudioPlayer():
 
         if sync:
             self.sync_script.sync_to_audio_position()
-        self.disable_auto_slider = False
 
 
     def go_to_next_audio_file(self):
@@ -154,13 +153,13 @@ class AudioPlayer():
 
 
     def on_slider_value_change(self, instance, value):
-        self.disable_auto_slider = True
         pos = self.slider.value
         # Calculate the new audio position based on the slider value
         new_audio_position = pos * self.duration
         if abs(new_audio_position - self.current_audio_position) > 1:
+            self.enable_status_update = False
             self.go_to_audio_file_position(self.current_audio_idx, new_audio_position)
-        self.disable_auto_slider = False
+            self.enable_status_update = True
 
 
     def save_last_played_timestamp(self):
