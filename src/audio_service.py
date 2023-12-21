@@ -100,5 +100,5 @@ def service_thread(app_port, service_port):
         time.sleep(0.1)
         service_manager.status_message()
         
-if __name__ == "__main__":
-    service_thread(8000, 8001)
+
+service_thread(8000, 8001)
