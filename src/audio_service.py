@@ -77,7 +77,6 @@ def load_audio_file(service_manager, *values):
     """
     values = (filename, start_time=0, is_playing)
     """
-    print("loading audio file")
     filename = values[0].decode('utf-8')
     start_time = float(values[1])
     is_playing = bool(values[2])

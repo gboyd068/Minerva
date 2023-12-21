@@ -171,7 +171,7 @@ class SyncScript():
             dialog.open()
             Clock.schedule_once(lambda dt: self._generate_sync_data(dialog))
         else:
-            self._finish_load_book(sync_data)
+            Clock.schedule_once(lambda dt: self._finish_load_book(sync_data))
 
 
     def _finish_load_book(self, sync_data):

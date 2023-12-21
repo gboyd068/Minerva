@@ -15,7 +15,7 @@ if platform == "android":
     from jnius import cast
     from android import activity
     from android.storage import primary_external_storage_path
-
+    
 from src.library_screen import LibraryScreen
 from src.player_screen import PlayerScreen
 from settingsjson import settings_json
