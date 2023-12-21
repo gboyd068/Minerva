@@ -9,7 +9,8 @@ from kivy.clock import Clock
 from kivy.utils import platform
 from json import JSONDecodeError
 from oscpy.server import OSCThreadServer
-from src.audio_service import service_thread
+if platform != "android":
+    from src.audio_service import service_thread
  
 class AudioPlayer():
     def __init__(self, audio_path=None):
