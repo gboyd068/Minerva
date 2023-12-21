@@ -40,7 +40,6 @@ class SyncScript():
 
     def sync_to_text_position(self):
         self.audio_player.enable_status_update = False
-        time.sleep(0.5)
         bookpos = (self.reader_window.current_item_index, self.reader_window.paragraph_within_chapter, self.reader_window.start_page_paragraph_pos)
         audio_file_idx, audio_position = self.file_time_from_bookpos(bookpos)
         self.audio_player.go_to_audio_file_position(audio_file_idx, audio_position, sync=False)
