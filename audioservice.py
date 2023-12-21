@@ -2,7 +2,7 @@ from oscpy.server import OSCThreadServer
 # from src.playback import Playback
 import time
 from functools import partial
-
+from kivy.utils import platform
 if platform == 'android':
     from jnius import autoclass
     PythonService = autoclass('org.kivy.android.PythonService')
