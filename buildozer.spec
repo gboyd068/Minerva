@@ -54,7 +54,7 @@ requirements = python3,kivy,kivymd,pillow,androidstorage4kivy,oscpy,ffmpeg,ffpyp
 orientation = portrait
 
 # (list) List of service to declare
-services = audioservice:src/audio_service.py
+services = audioservice:audioservice.py
 
 #
 # OSX Specific
