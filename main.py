@@ -56,6 +56,15 @@ class MinervaApp(MDApp):
         )
         self.primary_ext_storage = None
         self.permissions_external_storage()
+
+    def build(self):
+        kv = Builder.load_file("main.kv")
+        self.settings_cls = MySettings
+        self.use_kivy_settings = False
+        self.theme_cls.theme_style = self.config.get('General', 'theme')
+        if self.config.get('General', 'library_path') == "None":
+            Clock.schedule_once(self.file_manager_open)
+        return kv
         
 
     def permissions_external_storage(self, *args):                  
@@ -88,13 +97,7 @@ class MinervaApp(MDApp):
                     )
                     currentActivity.startActivityForResult(intent, 101)
 
-    def build(self):
-        kv = Builder.load_file("main.kv")
-        self.settings_cls = MySettings
-        self.use_kivy_settings = False
-        self.theme_cls.theme_style = self.config.get('General', 'theme')
-        Clock.schedule_once(self.file_manager_open)
-        return kv
+
     
     def file_manager_open(self,dt):
         dir = self.user_data_dir
@@ -110,13 +113,12 @@ class MinervaApp(MDApp):
         :type path: str;
         :param path: path to the selected directory or file;
         '''
-
         self.exit_manager()
         print(glob.glob(os.path.join(path, "*"), recursive=True))
         self.config.set('General', 'library_path', path)
+        self.config.write()
         self.root.library_screen.library_path = path
         self.root.library_screen.load_library()
-        toast(path)
 
     def exit_manager(self, *args):
         '''Called when the user reaches the root of the directory tree.'''
@@ -125,8 +127,8 @@ class MinervaApp(MDApp):
         self.file_manager.close()
 
     def build_config(self, config):
-        config.adddefaultsection('General') 
-        config.setdefault('General','library_path', '.')
+        config.adddefaultsection('General')
+        config.setdefault('General','library_path', 'None')
         config.setdefault('General', 'theme', 'Light')
         config.setdefault('General','text_margin', 40)
         config.setdefault('General','font_size', 40)
