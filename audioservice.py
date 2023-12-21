@@ -3,6 +3,10 @@ from src.playback import Playback
 import time
 from functools import partial
 
+if platform == 'android':
+    from jnius import autoclass
+    PythonService = autoclass('org.kivy.android.PythonService')
+    PythonService.mService.setAutoRestartService(True)
 
 class ServiceManagaer():
     def __init__(self, app_port, service_port):
