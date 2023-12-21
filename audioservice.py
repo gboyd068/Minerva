@@ -6,6 +6,7 @@ from kivy.utils import platform
 if platform == 'android':
     from jnius import autoclass
     PythonService = autoclass('org.kivy.android.PythonService')
+    MediaPlayer = autoclass('android.media.MediaPlayer')
     PythonService.mService.setAutoRestartService(True)
 
 class ServiceManagaer():
@@ -14,7 +15,7 @@ class ServiceManagaer():
         self.service_port = service_port
         self.osc = OSCThreadServer()
         self.osc.listen(address='localhost', port=service_port, default=True)
-        self.playback = None
+        self.playback = MediaPlayer()
         self.start_time = None
 
         # settings
@@ -50,7 +51,7 @@ class ServiceManagaer():
     def play(self, *values):
         print("play")
         if self.playback is not None:
-            self.playback.play()
+            self.playback.start()
 
     def pause(self, *values):
         print("pause")
@@ -86,12 +87,14 @@ def load_audio_file(service_manager, *values):
     is_playing = bool(values[2])
     print(filename, start_time)
     service_manager.start_time  = start_time
-    service_manager.playback = Playback(filename=filename,
-                                callback=service_manager.audio_callback,
-                                ff_opts={'af': f'atempo={service_manager.playback_speed}',
-                                        'ss': start_time, 
-                                        'vn': True,
-                                        })
+    service_manager.playback.setDataSource(filename)
+    service_manager.playback.prepare()
+    # service_manager.playback = Playback(filename=filename,
+    #                             callback=service_manager.audio_callback,
+    #                             ff_opts={'af': f'atempo={service_manager.playback_speed}',
+    #                                     'ss': start_time, 
+    #                                     'vn': True,
+    #                                     })
     if is_playing:
         service_manager.playback.play()
 
