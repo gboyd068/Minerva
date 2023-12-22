@@ -146,6 +146,8 @@ class AudioPlayer():
         else:
             self.seek(audio_position)
 
+        self.current_audio_idx = audio_file_idx
+        self.current_audio_position = audio_position
         if sync:
             self.sync_script.sync_to_audio_position()
 
