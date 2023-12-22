@@ -115,6 +115,7 @@ class SyncScript():
         book_time_dict = {}
 
         subtitle_files = glob.glob(os.path.join(self.book_path, "subs", "*.srt"))
+        subtitle_files.sort()
         print(subtitle_files)
         step_size = 200
         for i, file in enumerate(subtitle_files):
