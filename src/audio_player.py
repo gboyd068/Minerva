@@ -115,6 +115,7 @@ class AudioPlayer():
 
     def load_audio_path(self, audio_path):
         self.audio_filenames = glob.glob(os.path.join(audio_path, "*.mp3"))
+        self.audio_filenames.sort()
         book_dir_name = str(pathlib.Path(audio_path).parents[0])
         user_data_dir = MDApp.get_running_app().user_data_dir
         self.timestamp_path = os.path.join(user_data_dir, book_dir_name,
