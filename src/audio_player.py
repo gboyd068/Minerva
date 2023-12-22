@@ -74,16 +74,21 @@ class AudioPlayer():
     def send_message(self, address, values):
         self.osc.send_message(address, values, 'localhost', self.service_port)
 
+    def update_filenames(self, filenames):
+        bfilenames = [str.encode(filename) for filename in filenames]
+        self.send_message(b'/update_filenames', bfilenames)
+
     def status_update(self, *values):
         """
         called when status is updated from the service
-        values = (current_audio_position: float, is_playing: int, duration: float)
+        values = (current_audio_idx, current_audio_position: float, is_playing: int, duration: float)
         """
         if self.enable_status_update:
-            self.is_playing = bool(values[1])
+            self.is_playing = bool(values[2])
             if self.is_playing:
-                self.current_audio_position = float(values[0])
-            self.duration = float(values[2])
+                self.current_audio_idx = int(values[0])
+                self.current_audio_position = float(values[1])
+            self.duration = float(values[3])
 
             # update slider
             if self.is_playing:
@@ -123,12 +128,23 @@ class AudioPlayer():
         self.current_audio_position = start_time
         self.is_audio_loaded = True
 
+    def seek(self, audio_position):
+        """
+        audio_position: float
+                audio position in seconds
+        """
+        self.send_message(b'/seek', [audio_position])
 
 
     def go_to_audio_file_position(self, audio_file_idx, audio_position, sync=True):
-        self.current_audio_idx = audio_file_idx
-        self.current_audio_position = audio_position
-        self.load_audio_file(self.current_audio_idx, audio_position)
+        # should probably test that the audio_position is within the duration
+        if audio_file_idx != self.current_audio_idx:
+            if 0 <= audio_file_idx < len(self.audio_filenames):
+                self.current_audio_idx = audio_file_idx
+                self.current_audio_position = audio_position
+                self.load_audio_file(self.current_audio_idx, audio_position)
+        else:
+            self.seek(audio_position)
 
         if sync:
             self.sync_script.sync_to_audio_position()
@@ -200,3 +216,7 @@ class AudioPlayer():
         except (FileNotFoundError, JSONDecodeError):
             self.go_to_audio_file_position(0, 0)
             
+
+    def change_playback_speed(self, playback_speed):
+        self.playback_speed = playback_speed
+        self.send_message(b'/update_settings', [playback_speed])

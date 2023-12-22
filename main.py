@@ -160,10 +160,7 @@ class MinervaApp(MDApp):
         if key == "playback_speed":
             audio_player = self.root.player_screen.audio_player
             audio_player.enable_status_update = False
-            audio_player.playback_speed = float(value)
-            if audio_player.is_audio_loaded and audio_player.current_audio_idx is not None:
-                audio_player.load_audio_file(audio_player.current_audio_idx, audio_player.current_audio_position)
-            audio_player.enable_status_update = True
+            audio_player.change_playback_speed(float(value))
         if key == "auto_page_turn":
             self.root.player_screen.sync_script.auto_page_turn_enabled = not value=="0"
 

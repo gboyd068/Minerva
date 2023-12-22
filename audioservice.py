@@ -19,9 +19,11 @@ class ServiceManagaer():
         self.playback = MediaPlayer()
         self.playback_params = PlaybackParams()
         self.start_time = None
+        self.current_audio_idx = None
+        self.filenames = None
 
         # settings
-        self.playback_speed = 1.5
+        self.playback_speed = 1.0
         self.playback_params.setSpeed(self.playback_speed)
 
         
@@ -39,6 +41,8 @@ class ServiceManagaer():
         self.osc.bind(b'/pause', self.pause)
         # seek
         self.osc.bind(b'/seek', self.seek)
+        # update filenames
+        self.osc.bind(b'/update_filenames', self.update_filenames)
 
 
 
@@ -46,6 +50,11 @@ class ServiceManagaer():
     def send_message(self, address, values):
         self.osc.send_message(address, values, 'localhost', self.app_port)
 
+    def update_filenames(self, *values):
+        """
+        values is tuple of filenames as bytestrings
+        """
+        self.filenames = [filename.decode('utf-8') for filename in values]
 
     def update_settings(self, *values):
         """
@@ -53,6 +62,12 @@ class ServiceManagaer():
         """
         print("service settings update", values)
         self.playback_speed = float(values[0])
+        if 0 < self.playback_speed < 3:
+            self.playback_params.setSpeed(self.playback_speed)
+            is_playing = self.playback.isPlaying()
+            self.playback.setPlaybackParams(self.playback_params) # changing to non-zero speed causes play
+            if not is_playing:
+                self.playback.pause()
 
         
     def play(self, *values):
@@ -84,11 +99,11 @@ class ServiceManagaer():
     def status_message(self):
         """
         send osc message to app with current status
-        (current_audio_position: float, is_playing: int)
+        (current_audio_idx:int, current_audio_position: float, is_playing: int, duration: float)
         """
         if self.playback.getDuration() != -1:
             current_position = self.playback.getCurrentPosition()/1000
-            self.send_message(b'/status', [current_position, self.playback.isPlaying(), self.playback.getDuration()/1000])
+            self.send_message(b'/status', [self.current_audio_idx, current_position, self.playback.isPlaying(), self.playback.getDuration()/1000])
 
 
 # I have no idea why the others work fine as methods but this one doesnt
