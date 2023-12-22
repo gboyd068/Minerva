@@ -39,7 +39,9 @@ class LibraryScreen(Screen):
 
     def check_directory_in_library(self, directory):
         audio_files = glob.glob(os.path.join(directory, "audio", "*.mp3"))
+        audio_files.sort()
         sub_files = glob.glob(os.path.join(directory, "subs", "*.srt"))
+        sub_files.sort()
 
         if len(audio_files) == 0 or len(sub_files) == 0:
             return False
@@ -58,6 +60,7 @@ class LibraryScreen(Screen):
     def load_library(self):
         self.ids.library_scroll_layout.clear_widgets()
         entries = glob.glob(os.path.join(self.library_path, "*"))
+        entries.sort()
         subdirs = [entry for entry in entries if os.path.isdir(entry)]
         for subdir in subdirs:
             dir_check_result = self.check_directory_in_library(subdir)

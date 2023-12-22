@@ -89,6 +89,7 @@ class SyncScript():
     def _index_audiobook(self):
         # get lengths of all audio files
         audio_files = glob.glob(os.path.join(self.book_path, "audio", "*.mp3"))
+        audio_files.sort()
         audio_file_start_times = []
         time_elapsed = 0
         for file in audio_files:
