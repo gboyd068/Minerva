@@ -100,7 +100,7 @@ class AudioPlayer():
             if self.sync_script.auto_page_turn_enabled and self.is_playing:
                 file_time = self.sync_script.file_time_from_bookpos(self.sync_script.end_page_bookpos)
                 file_index = file_time[0]
-                NEXT_PAGE_LEEWAY = 0 # WARNING HACK
+                NEXT_PAGE_LEEWAY = 5 # WARNING HACK
                 time_diff_to_page_turn = file_time[1] + NEXT_PAGE_LEEWAY - self.start_time
                 time_diff_from_start = (self.current_audio_position - self.start_time) * self.playback_speed
                 print(time_diff_to_page_turn, time_diff_from_start)
