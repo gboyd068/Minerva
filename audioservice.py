@@ -109,9 +109,9 @@ class ServiceManagaer():
 # I have no idea why the others work fine as methods but this one doesnt
 def load_audio_file(service_manager, *values):
     """
-    values = (filename, start_time=0, is_playing)
+    values = (audio_file_idx, start_time=0, is_playing)
     """
-    filename = values[0].decode('utf-8')
+    filename = service_manager.filenames[int(values[0])]
     start_time = float(values[1])
     is_playing = bool(values[2])
     print(filename, start_time)
