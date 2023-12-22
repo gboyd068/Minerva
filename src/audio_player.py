@@ -141,11 +141,14 @@ class AudioPlayer():
         print("go_to_audio_file_position", audio_file_idx, audio_position)
         print("current_audio_idx", self.current_audio_idx)
         print("current_audio_position", self.current_audio_position)
+        if not 0 <= audio_file_idx < len(self.audio_filenames):
+            print("audio file index out of range")
+            audio_file_idx = 0
+            audio_position = 0
         if audio_file_idx != self.current_audio_idx:
-            if 0 <= audio_file_idx < len(self.audio_filenames):
-                self.current_audio_idx = audio_file_idx
-                self.current_audio_position = audio_position
-                self.load_audio_file(self.current_audio_idx, audio_position)
+            self.current_audio_idx = audio_file_idx
+            self.current_audio_position = audio_position
+            self.load_audio_file(self.current_audio_idx, audio_position)
         else:
             self.seek(audio_position)
 
