@@ -195,6 +195,7 @@ class ReaderWindow(MDLabel):
             #     start = self.paragraph_within_chapter - self.page_buffer
             #     end = self.paragraph_within_chapter
             #     page_text = self.get_page_text(chapter_text, start, end, prev)
+            # self.text = "[color=ff3333]"+page_text+"[/color]"
             self.text = page_text
             self.texture_update()
 

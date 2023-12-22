@@ -115,8 +115,10 @@ class SyncScript():
         book_time_dict = {}
 
         subtitle_files = glob.glob(os.path.join(self.book_path, "subs", "*.srt"))
+        print(subtitle_files)
         step_size = 200
         for i, file in enumerate(subtitle_files):
+            print("syncing", file)
             subtitles = pysrt.open(file)
             for sidx, s in enumerate(subtitles):
                 # move on to next subtitle if that subtitle isn't in the book
@@ -129,8 +131,14 @@ class SyncScript():
                 # Find the best matching substring within the larger text
                 match = matcher.find_longest_match(start_index, min(
                     start_index+step_size, len(booktext)), 0, len(text))
+                # do a reverse comparison from that result
+                
+                # get text from book that matches the same region of characters
+                book_match_region = booktext[match.a-match.b:match.a-match.b+sub_length]
+                # compare with ratio
+                ratio = difflib.SequenceMatcher(None, text, book_match_region).ratio()
 
-                if match.size > sub_length//3: # reasonable match is found
+                if ratio > 0.5: # reasonable match is found
                     step_size = 200
                     # Start index of the best match
                     start_index = match.a 
