@@ -44,7 +44,7 @@ requirements = python3,kivy,kivymd,pillow,androidstorage4kivy,oscpy,ffmpeg,ffpyp
 # requirements.source.kivy = ../../kivy
 
 # (str) Presplash of the application
-presplash.filename = %(source.dir)s/icons/icon.png
+presplash.filename = %(source.dir)s/icons/transparent_presplash.png
 
 # (str) Icon of the application
 icon.filename = %(source.dir)s/icons/icon.png
