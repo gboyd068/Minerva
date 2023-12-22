@@ -143,7 +143,7 @@ class SyncScript():
                 if ratio > 0.75: # reasonable match is found
                     step_size = 200
                     # Start index of the best match
-                    start_index = match.a 
+                    start_index = match.a - match.b
                     # End index of the best match
                     end_index = match.a + match.size
                     book_time_dict[start_index] = self.get_total_time(i, self.audio_player.subtitle_time_to_seconds(
