@@ -54,17 +54,17 @@ class ServiceManagaer():
         
     def play(self, *values):
         print("play")
-        if self.playback is not None:
+        if self.playback.getDuration() != -1:
             self.playback.start()
 
     def pause(self, *values):
         print("pause")
-        if self.playback is not None:
+        if self.playback.getDuration() != -1:
             self.playback.pause()
     
     def seek(self, *values):
         print("seeking")
-        if self.playback is not None:
+        if self.playback.getDuration() != -1:
             self.playback.seekTo(int(values[0]*1000))
 
 
@@ -83,7 +83,7 @@ class ServiceManagaer():
         send osc message to app with current status
         (current_audio_position: float, is_playing: int)
         """
-        if self.playback is not None:
+        if self.playback.getDuration() != -1:
             current_position = self.playback.getCurrentPosition()
             self.send_message(b'/status', [current_position, self.playback.isPlaying(), self.playback.getDuration()/1000])
 
@@ -98,7 +98,7 @@ def load_audio_file(service_manager, *values):
     is_playing = bool(values[2])
     print(filename, start_time)
     service_manager.start_time  = start_time
-    service_manager.playback.release()
+    service_manager.playback.reset()
     service_manager.playback.setDataSource(filename)
     service_manager.playback.prepare()
     service_manager.playback.seekTo(int(start_time*1000))
