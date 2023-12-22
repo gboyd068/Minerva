@@ -34,8 +34,12 @@ class ServiceManagaer():
         self.osc.bind(b'/play', self.play)
         # pause
         self.osc.bind(b'/pause', self.pause)
+        # seek
+        self.osc.bind(b'/seek', self.seek)
 
 
+
+    # NEED TO SEND OVER ALL THE FILENAMES, WHAT HAPPENS IF WE GO TO NEXT FILE WHILE MINIMIZED
     def send_message(self, address, values):
         self.osc.send_message(address, values, 'localhost', self.app_port)
 
@@ -57,6 +61,11 @@ class ServiceManagaer():
         print("pause")
         if self.playback is not None:
             self.playback.pause()
+    
+    def seek(self, *values):
+        print("seeking")
+        if self.playback is not None:
+            self.playback.seekTo(int(values[0]*1000))
 
 
     def audio_callback(self, selector, value):
@@ -75,7 +84,9 @@ class ServiceManagaer():
         (current_audio_position: float, is_playing: int)
         """
         if self.playback is not None:
-            self.send_message(b'/status', [self.playback.get_pts(), not self.playback.get_pause(), self.playback.duration])
+            current_position = self.playback.getCurrentPosition()
+            self.send_message(b'/status', [current_position, self.playback.isPlaying(), self.playback.getDuration()/1000])
+
 
 # I have no idea why the others work fine as methods but this one doesnt
 def load_audio_file(service_manager, *values):
@@ -87,8 +98,10 @@ def load_audio_file(service_manager, *values):
     is_playing = bool(values[2])
     print(filename, start_time)
     service_manager.start_time  = start_time
+    service_manager.playback.release()
     service_manager.playback.setDataSource(filename)
     service_manager.playback.prepare()
+    service_manager.playback.seekTo(int(start_time*1000))
     # service_manager.playback = Playback(filename=filename,
     #                             callback=service_manager.audio_callback,
     #                             ff_opts={'af': f'atempo={service_manager.playback_speed}',
@@ -96,7 +109,7 @@ def load_audio_file(service_manager, *values):
     #                                     'vn': True,
     #                                     })
     if is_playing:
-        service_manager.playback.play()
+        service_manager.play()
 
 
 def service_thread(app_port, service_port):
@@ -105,7 +118,7 @@ def service_thread(app_port, service_port):
     while True:
         # need to manage callbacks from playback
         time.sleep(0.1)
-        # service_manager.status_message()
+        service_manager.status_message()
         
 
 service_thread(8000, 8001)
