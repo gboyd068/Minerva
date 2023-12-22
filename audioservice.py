@@ -84,7 +84,7 @@ class ServiceManagaer():
         (current_audio_position: float, is_playing: int)
         """
         if self.playback.getDuration() != -1:
-            current_position = self.playback.getCurrentPosition()
+            current_position = self.playback.getCurrentPosition()/1000
             self.send_message(b'/status', [current_position, self.playback.isPlaying(), self.playback.getDuration()/1000])
 
 
