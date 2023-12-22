@@ -138,6 +138,9 @@ class AudioPlayer():
 
     def go_to_audio_file_position(self, audio_file_idx, audio_position, sync=True):
         # should probably test that the audio_position is within the duration
+        print("go_to_audio_file_position", audio_file_idx, audio_position)
+        print("current_audio_idx", self.current_audio_idx)
+        print("current_audio_position", self.current_audio_position)
         if audio_file_idx != self.current_audio_idx:
             if 0 <= audio_file_idx < len(self.audio_filenames):
                 self.current_audio_idx = audio_file_idx

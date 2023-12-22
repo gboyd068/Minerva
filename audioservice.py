@@ -55,6 +55,7 @@ class ServiceManagaer():
         values is tuple of filenames as bytestrings
         """
         self.filenames = [filename.decode('utf-8') for filename in values]
+        print("service filenames: ", self.filenames)
 
     def update_settings(self, *values):
         """
