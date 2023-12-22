@@ -112,6 +112,7 @@ def load_audio_file(service_manager, *values):
     """
     values = (audio_file_idx, start_time=0, is_playing)
     """
+    service_manager.current_audio_idx = int(values[0])
     filename = service_manager.filenames[int(values[0])]
     start_time = float(values[1])
     is_playing = bool(values[2])
