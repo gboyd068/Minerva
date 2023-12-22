@@ -19,7 +19,7 @@ class ServiceManagaer():
         self.playback = MediaPlayer()
         self.playback_params = PlaybackParams()
         self.start_time = None
-        self.current_audio_idx = None
+        self.current_audio_idx = -1
         self.filenames = None
 
         # settings
