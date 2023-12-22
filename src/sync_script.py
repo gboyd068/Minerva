@@ -140,7 +140,7 @@ class SyncScript():
                 # compare with ratio
                 ratio = difflib.SequenceMatcher(None, text, book_match_region).ratio()
 
-                if ratio > 0.5: # reasonable match is found
+                if ratio > 0.75: # reasonable match is found
                     step_size = 200
                     # Start index of the best match
                     start_index = match.a 
