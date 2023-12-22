@@ -7,6 +7,7 @@ if platform == 'android':
     from jnius import autoclass
     PythonService = autoclass('org.kivy.android.PythonService')
     MediaPlayer = autoclass('android.media.MediaPlayer')
+    PlaybackParams = autoclass('android.media.PlaybackParams')
     PythonService.mService.setAutoRestartService(True)
 
 class ServiceManagaer():
@@ -16,10 +17,12 @@ class ServiceManagaer():
         self.osc = OSCThreadServer()
         self.osc.listen(address='localhost', port=service_port, default=True)
         self.playback = MediaPlayer()
+        self.playback_params = PlaybackParams()
         self.start_time = None
 
         # settings
-        self.playback_speed = 1.0
+        self.playback_speed = 1.5
+        self.playback_params.setSpeed(self.playback_speed)
 
         
         # BIND OSC CALLBACKS
@@ -100,6 +103,7 @@ def load_audio_file(service_manager, *values):
     service_manager.start_time  = start_time
     service_manager.playback.reset()
     service_manager.playback.setDataSource(filename)
+    service_manager.playback.setPlaybackParams(service_manager.playback_params)
     service_manager.playback.prepare()
     service_manager.playback.seekTo(int(start_time*1000))
     # service_manager.playback = Playback(filename=filename,
