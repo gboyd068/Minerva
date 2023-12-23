@@ -188,6 +188,8 @@ class MinervaApp(MDApp):
     def on_resume(self):
         audio_player = self.root.player_screen.audio_player
         audio_player.disable_saving = False
+        if audio_player.is_playing:
+            audio_player.sync_script.sync_to_audio_position()
         return True
 
     
