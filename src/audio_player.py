@@ -91,8 +91,7 @@ class AudioPlayer():
             self.duration = float(values[3])
 
             # update slider
-            if self.is_playing:
-                Clock.schedule_once(self.set_slider_value)
+            Clock.schedule_once(self.set_slider_value)
 
             # update play/pause button
 

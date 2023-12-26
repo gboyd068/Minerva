@@ -198,6 +198,9 @@ class ReaderWindow(MDLabel):
             # self.text = "[color=ff3333]"+page_text+"[/color]"
             self.text = page_text
             self.texture_update()
+            # if not playing audio, sync to the text position
+            if not self.audio_player.is_playing:
+                self.sync_script.sync_to_book_position()
 
     def get_page_text(self, chapter_text, start, end, prev, cuttoff=True):
         # get paragraphs between self.paragraph_within_chapter and self.paragraph_within_chapter + self.page_buffer
