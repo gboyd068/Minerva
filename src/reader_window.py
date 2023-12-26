@@ -29,6 +29,7 @@ class ReaderWindow(MDLabel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.sync_script = None
+        self.audio_player = None
         self.epub_file = None
         self.book = None
         self.current_item_index = 0
@@ -49,7 +50,8 @@ class ReaderWindow(MDLabel):
     def _finish_init(self, dt):
         # get a reference for the slider so sync script can update it
         app = MDApp.get_running_app()
-        self.sync_script = app.root.ids.player_screen.sync_script
+        self.sync_script = app.root.player_screen.sync_script
+        self.audio_player = app.root.player_screen.audio_player
 
 
     def generate_book_items_list(self, book):
