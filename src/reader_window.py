@@ -202,7 +202,7 @@ class ReaderWindow(MDLabel):
             self.texture_update()
             # if not playing audio, sync to the text position
             if not self.audio_player.is_playing:
-                self.sync_script.sync_to_book_position()
+                self.sync_script.sync_to_text_position()
 
     def get_page_text(self, chapter_text, start, end, prev, cuttoff=True):
         # get paragraphs between self.paragraph_within_chapter and self.paragraph_within_chapter + self.page_buffer
