@@ -45,7 +45,6 @@ class MySettings(SettingsWithNoMenu):
 
 
 class MinervaApp(MDApp):
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.manager_open = False
@@ -56,7 +55,7 @@ class MinervaApp(MDApp):
         )
         self.primary_ext_storage = None
         self.permissions_external_storage()
-
+ 
     def build(self):
         kv = Builder.load_file("main.kv")
         self.settings_cls = MySettings

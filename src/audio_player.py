@@ -116,10 +116,11 @@ class AudioPlayer():
     def load_audio_path(self, audio_path):
         self.audio_filenames = glob.glob(os.path.join(audio_path, "*.mp3"))
         self.audio_filenames.sort()
-        book_dir_name = str(pathlib.Path(audio_path).parents[0])
+        book_dir_name = str(pathlib.Path(audio_path).parents[0].name)
         user_data_dir = MDApp.get_running_app().user_data_dir
         self.timestamp_path = os.path.join(user_data_dir, book_dir_name,
                                            "last_played_timestamp.json")
+        print(self.timestamp_path)
         self.update_filenames(self.audio_filenames)
 
 
@@ -205,9 +206,17 @@ class AudioPlayer():
     def save_last_played_timestamp(self):
         if self.disable_saving:
             return
+        
+        # calculate percentage through the book
+        cumulative_position = self.sync_script.get_total_time(self.current_audio_idx, self.current_audio_position)
+        total_duration = self.sync_script.total_duration
+        percentage_through_book = 100 * cumulative_position / total_duration
+        
         try:
             timestamp = {"audio_file_idx": self.current_audio_idx,
-                         "audio_position": self.current_audio_position}
+                        "audio_position": self.current_audio_position,
+                        "percentage_through_book": percentage_through_book
+                        }
             if not os.path.exists(os.path.dirname(self.timestamp_path)):
                 os.makedirs(os.path.dirname(self.timestamp_path))
             with open(self.timestamp_path, "w+") as file:
@@ -215,16 +224,20 @@ class AudioPlayer():
         except FileNotFoundError:
             pass
 
-    def load_last_played_timestamp(self):
+    def get_last_played_timestamp(self):
         try:
             with open(self.timestamp_path, "r") as file:
                 timestamp = json.load(file)
                 audio_index = timestamp["audio_file_idx"]
                 audio_position = timestamp["audio_position"]
-                self.go_to_audio_file_position(audio_index, audio_position)
+                percentage_through_book = timestamp["percentage_through_book"]
+                return audio_index, audio_position, percentage_through_book
         except (FileNotFoundError, JSONDecodeError):
-            self.go_to_audio_file_position(0, 0)
-            
+            return 0, 0, 0
+
+    def load_last_played_timestamp(self):
+        audio_index, audio_position, percentage = self.get_last_played_timestamp()
+        self.go_to_audio_file_position(audio_index, audio_position)
 
     def change_playback_speed(self, playback_speed):
         self.playback_speed = playback_speed

@@ -1,8 +1,9 @@
 # library.kv
 #: include screens/player.kv
 
-<LibraryEntry>
+<LibraryEntry>:
     size_hint_y: None
+    orientation: 'vertical'
     height: '150dp'
     text: 'Title of the audiobook'
     font_size: '18sp'
@@ -12,17 +13,17 @@
     on_release: 
         app.root.transition.direction = 'left'
         self.library_entry_selected()
+        
 
-    # Add a label for percentage completion
-    MDLabel:
-        text: '50% complete'
-        pos_hint: {'bottom':1, 'right': 1}
-        size_hint_y: None
-        height: '60dp'
-        font_size: '14sp'
-        halign: 'center'
-        valign: 'center'
-        text_size: self.width, self.height
+<PercentageLabel>:
+    pos_hint: {'bottom':1, 'right': 1}
+    size_hint_y: None
+    height: '60dp'
+    font_size: '14sp'
+    halign: 'center'
+    valign: 'center'
+    text_size: self.width, self.height
+
 
 <LibraryScreen>:
     name: "library"

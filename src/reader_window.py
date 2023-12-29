@@ -202,6 +202,7 @@ class ReaderWindow(MDLabel):
             self.texture_update()
             # if not playing audio, sync to the text position
             if not self.audio_player.is_playing:
+                # NEED TO FIX SYNCING ON GOING BACK A PAGE
                 self.sync_script.sync_to_text_position()
 
     def get_page_text(self, chapter_text, start, end, prev, cuttoff=True):

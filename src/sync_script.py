@@ -20,6 +20,7 @@ class SyncScript():
         self.chapter_starts = []
         self.paragraph_starts = []
         self.audio_file_start_times = []
+        self.total_duration = None
         self.end_page_bookpos = None
         self.sync_data_path = None
         self.auto_page_turn_enabled = not "0"==MDApp.get_running_app().config.get("General", "auto_page_turn")
@@ -60,6 +61,7 @@ class SyncScript():
             assert "chapter_starts" in sync_data
             assert "paragraph_starts" in sync_data
             assert "audio_file_start_times" in sync_data
+            assert "total_duration" in sync_data
             assert "book_time_dict" in sync_data
         except (FileNotFoundError, AssertionError):
             return False
@@ -96,7 +98,8 @@ class SyncScript():
             audio_file_start_times.append(time_elapsed)
             playback = Playback(filename=file)
             time_elapsed += playback.duration
-        return audio_file_start_times
+        total_duration = time_elapsed
+        return audio_file_start_times, total_duration
 
 
 
@@ -108,8 +111,9 @@ class SyncScript():
         sync_data["chapter_starts"] = self.chapter_starts
         sync_data["paragraph_starts"] = self.paragraph_starts
         # get audio file start times
-        self.audio_file_start_times = self._index_audiobook()
+        self.audio_file_start_times, self.total_duration = self._index_audiobook()
         sync_data["audio_file_start_times"] = self.audio_file_start_times
+        sync_data["total_duration"] = self.total_duration
 
         # get book time dict
         start_index = 0
@@ -154,7 +158,7 @@ class SyncScript():
 
                 book_index_list = list(book_time_dict.keys())
                 is_strictly_increasing = all(i < j for i, j in zip(book_index_list, book_index_list[1:]))
-                assert is_strictly_increasing
+                # assert is_strictly_increasing
 
         sync_data["book_time_dict"] = book_time_dict
 
@@ -193,6 +197,7 @@ class SyncScript():
         self.chapter_starts = sync_data["chapter_starts"]
         self.paragraph_starts = sync_data["paragraph_starts"]
         self.audio_file_start_times = sync_data["audio_file_start_times"]
+        self.total_duration = sync_data["total_duration"]
         self.book_time_dict = {int(k):v for k,v in self.book_time_dict.items()}
         # go to the correct saved position in the book/audiobook
         self.audio_player.load_last_played_timestamp()

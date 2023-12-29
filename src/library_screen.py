@@ -1,30 +1,38 @@
 from kivy.uix.screenmanager import Screen
 from kivy.uix.button import Button
 from kivymd.app import MDApp
-from kivymd.uix.button import MDRoundFlatButton
+from kivymd.uix.label import MDLabel
+from kivymd.uix.card import MDCard
 from kivy.clock import Clock
 import os
 import glob
+import json
+import pathlib
 from ebooklib import epub
 
 
-class LibraryEntry(Button):
-    def __init__(self, book_path, book_title, book_author, **kwargs):
+class LibraryEntry(MDCard):
+    def __init__(self, book_path, book_title, book_author, percentage,**kwargs):
         super().__init__(**kwargs)
         self.book_path = book_path
-        self.text = book_title
-        # get how far through the book the user is to display on the button
+        self.add_widget(MDLabel(text=book_title, halign="center", font_style="H6"))
+        self.add_widget(PercentageLabel(percentage=percentage))
 
     def library_entry_selected(self):
         # add code for loading the selected book
         app = MDApp.get_running_app()
-        app.root.ids.player_screen.sync_script.load_book(self.book_path)
+        app.root.player_screen.sync_script.load_book(self.book_path)
         Clock.schedule_once(self.go_to_player_screen)
 
     def go_to_player_screen(self, dt):
         app = MDApp.get_running_app()
         app.root.current = "player"
 
+
+class PercentageLabel(MDLabel):
+    def __init__(self, percentage, **kwargs):
+        super().__init__(**kwargs)
+        self.text = f"{percentage}%"
 
 
 class LibraryScreen(Screen):
@@ -55,6 +63,17 @@ class LibraryScreen(Screen):
             epub_file = epub_file[0]
 
         return True
+    
+    def get_last_played_timestamp(self, timestamp_path):
+        try:
+            with open(timestamp_path, "r") as file:
+                timestamp = json.load(file)
+                audio_index = timestamp["audio_file_idx"]
+                audio_position = timestamp["audio_position"]
+                percentage_through_book = timestamp["percentage_through_book"]
+                return audio_index, audio_position, percentage_through_book
+        except (FileNotFoundError, json.JSONDecodeError, KeyError):
+            return 0, 0, 0
 
     
     def load_library(self):
@@ -78,8 +97,17 @@ class LibraryScreen(Screen):
         if len(book_author) != 0:
             book_author = book_author[0][0]
 
+        # get percentage through
+        book_dir_name = str(pathlib.Path(book_path))
+        user_data_dir = MDApp.get_running_app().user_data_dir
+        timestamp_path = os.path.join(user_data_dir, book_dir_name,
+                                           "last_played_timestamp.json")
+        audio_index, audio_position, percentage_through_book = self.get_last_played_timestamp(timestamp_path)
+
+
         if book_title is None:
             book_title = os.path.basename(book_path)
         if book_author is None:
             book_author = "Unknown Author"
-        self.ids.library_scroll_layout.add_widget(LibraryEntry(book_path, book_title=book_title, book_author=book_author))
+        entry_widget = LibraryEntry(book_path, book_title=book_title, book_author=book_author, percentage=percentage_through_book)
+        self.ids.library_scroll_layout.add_widget(entry_widget)
