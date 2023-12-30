@@ -102,7 +102,7 @@ class AudioPlayer():
                 file_index = file_time[0]
                 NEXT_PAGE_LEEWAY = 5 # WARNING HACK
                 time_diff_to_page_turn = file_time[1] + NEXT_PAGE_LEEWAY - self.start_time
-                time_diff_from_start = (self.current_audio_position - self.start_time) * self.playback_speed
+                time_diff_from_start = (self.current_audio_position - self.start_time)
                 print(time_diff_to_page_turn, time_diff_from_start)
                 if time_diff_from_start > time_diff_to_page_turn and file_index == self.current_audio_idx:
                     Clock.schedule_once(lambda dt: self.sync_script.reader_window.next_page())
