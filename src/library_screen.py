@@ -72,7 +72,8 @@ class LibraryScreen(Screen):
                 audio_position = timestamp["audio_position"]
                 percentage_through_book = timestamp["percentage_through_book"]
                 return audio_index, audio_position, percentage_through_book
-        except (FileNotFoundError, json.JSONDecodeError, KeyError):
+        except (FileNotFoundError, json.JSONDecodeError, KeyError) as e:
+            print(e)
             return 0, 0, 0
 
     
@@ -98,12 +99,12 @@ class LibraryScreen(Screen):
             book_author = book_author[0][0]
 
         # get percentage through
-        book_dir_name = str(pathlib.Path(book_path))
+        book_dir_name = str(pathlib.Path(book_path).name)
         user_data_dir = MDApp.get_running_app().user_data_dir
         timestamp_path = os.path.join(user_data_dir, book_dir_name,
                                            "last_played_timestamp.json")
         audio_index, audio_position, percentage_through_book = self.get_last_played_timestamp(timestamp_path)
-
+        percentage_through_book = round(percentage_through_book, 1)
 
         if book_title is None:
             book_title = os.path.basename(book_path)
