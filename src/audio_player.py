@@ -189,9 +189,11 @@ class AudioPlayer():
 
 
     def set_slider_value(self, dt=None):
-        self.slider.value = self.current_audio_position / self.duration
-
-
+        try:
+            self.slider.value = self.current_audio_position / self.duration
+        except ZeroDivisionError as e:
+            print(e)
+            self.slider.value = 0
 
     def on_slider_value_change(self, instance, value):
         pos = self.slider.value

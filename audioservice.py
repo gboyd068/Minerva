@@ -8,7 +8,9 @@ if platform == 'android':
     PythonService = autoclass('org.kivy.android.PythonService')
     MediaPlayer = autoclass('android.media.MediaPlayer')
     PlaybackParams = autoclass('android.media.PlaybackParams')
+    FileInputStream = autoclass('java.io.FileInputStream')
     PythonService.mService.setAutoRestartService(True)
+    MediaSession = autoclass('android.media.session.MediaSession')
 
 class ServiceManagaer():
     def __init__(self, app_port, service_port):
@@ -17,6 +19,12 @@ class ServiceManagaer():
         self.osc = OSCThreadServer()
         self.osc.listen(address='localhost', port=service_port, default=True)
         self.playback = MediaPlayer()
+        # self.media_session = MediaSession(PythonService.mService, "Audioservice")
+        # self.media_session.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS |
+        #                             MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS)
+        # self.media_session.setActive(True)        
+
+
         self.playback_params = PlaybackParams()
         self.start_time = None
         self.current_audio_idx = -1
@@ -104,7 +112,9 @@ class ServiceManagaer():
         """
         if self.playback.getDuration() != -1:
             current_position = self.playback.getCurrentPosition()/1000
-            self.send_message(b'/status', [self.current_audio_idx, current_position, self.playback.isPlaying(), self.playback.getDuration()/1000])
+            status = [self.current_audio_idx, current_position, self.playback.isPlaying(), self.playback.getDuration()/1000]
+            print("STATUS: ", status)
+            self.send_message(b'/status', status)
 
 
 # I have no idea why the others work fine as methods but this one doesnt
@@ -112,23 +122,19 @@ def load_audio_file(service_manager, *values):
     """
     values = (audio_file_idx, start_time=0, is_playing)
     """
+    print("loading audio file", values)
     service_manager.current_audio_idx = int(values[0])
     filename = service_manager.filenames[int(values[0])]
     start_time = float(values[1])
     is_playing = bool(values[2])
     print(filename, start_time)
+    service_manager.fis = FileInputStream(filename)
     service_manager.start_time  = start_time
     service_manager.playback.reset()
-    service_manager.playback.setDataSource(filename)
+    service_manager.playback.setDataSource(service_manager.fis.getFD())
     service_manager.playback.setPlaybackParams(service_manager.playback_params)
     service_manager.playback.prepare()
     service_manager.playback.seekTo(int(start_time*1000))
-    # service_manager.playback = Playback(filename=filename,
-    #                             callback=service_manager.audio_callback,
-    #                             ff_opts={'af': f'atempo={service_manager.playback_speed}',
-    #                                     'ss': start_time, 
-    #                                     'vn': True,
-    #                                     })
     if is_playing:
         service_manager.play()
 
