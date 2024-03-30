@@ -19,7 +19,8 @@ class ServiceManagaer():
         self.osc = OSCThreadServer()
         self.osc.listen(address='localhost', port=service_port, default=True)
         self.playback = MediaPlayer()
-        self.playback.setOnCompletionListener(AudioCompletionCallback(self.audio_callback))
+        self._complete_callback = AudioCompletionCallback(self.audio_callback)
+        self.playback.setOnCompletionListener(self._complete_callback)
         # self.media_session = MediaSession(PythonService.mService, "Audioservice")
         # self.media_session.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS |
         #                             MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS)
@@ -97,13 +98,15 @@ class ServiceManagaer():
 
     # how do I add this callback to the mediaplayer object
     def audio_callback(self, mp):
-        print("eof")
-        # deal with end of file
-        num_files = len(self.filenames)
-        if self.current_audio_idx < num_files-1:
-            load_audio_file(self, (self.current_audio_idx+1, 0, True))
-        else:
-            print("end of playlist")
+        print("attempting end of file callback", self.playback.getDuration())
+        if self.playback.getDuration() != -1 and self.filenames is not None:
+            print("eof")
+            # deal with end of file
+            num_files = len(self.filenames)
+            if self.current_audio_idx < num_files-1:
+                load_audio_file(self, self.current_audio_idx+1, 0, True)
+            else:
+                print("end of playlist")
 
 
     def status_message(self):
