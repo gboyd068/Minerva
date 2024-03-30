@@ -4,7 +4,7 @@ import time
 from functools import partial
 from kivy.utils import platform
 if platform == 'android':
-    from jnius import autoclass
+    from jnius import autoclass, PythonJavaClass, java_method
     PythonService = autoclass('org.kivy.android.PythonService')
     MediaPlayer = autoclass('android.media.MediaPlayer')
     PlaybackParams = autoclass('android.media.PlaybackParams')
@@ -19,6 +19,7 @@ class ServiceManagaer():
         self.osc = OSCThreadServer()
         self.osc.listen(address='localhost', port=service_port, default=True)
         self.playback = MediaPlayer()
+        self.playback.setOnCompletionListener(AudioCompletionCallback(self.audio_callback))
         # self.media_session = MediaSession(PythonService.mService, "Audioservice")
         # self.media_session.setFlags(MediaSession.FLAG_HANDLES_MEDIA_BUTTONS |
         #                             MediaSession.FLAG_HANDLES_TRANSPORT_CONTROLS)
@@ -94,16 +95,16 @@ class ServiceManagaer():
         if self.playback.getDuration() != -1:
             self.playback.seekTo(int(values[0]*1000))
 
+    # how do I add this callback to the mediaplayer object
+    def audio_callback(self, mp):
+        print("eof")
+        # deal with end of file
+        num_files = len(self.filenames)
+        if self.current_audio_idx < num_files-1:
+            load_audio_file(self, (self.current_audio_idx+1, 0, True))
+        else:
+            print("end of playlist")
 
-    def audio_callback(self, selector, value):
-        if selector == "read:exit":
-            pass
-            # set slider value
-        if selector == "eof":
-            print("eof")
-            # deal with end of audio segment
-            
-            # deal with actual end of file
 
     def status_message(self):
         """
@@ -115,6 +116,20 @@ class ServiceManagaer():
             status = [self.current_audio_idx, current_position, self.playback.isPlaying(), self.playback.getDuration()/1000]
             print("STATUS: ", status)
             self.send_message(b'/status', status)
+
+
+
+class AudioCompletionCallback(PythonJavaClass):
+    # http://developer.android.com/reference/android/media/MediaPlayer.OnCompletionListener.html
+    __javainterfaces__ = ('android.media.MediaPlayer$OnCompletionListener', )
+
+    def __init__(self, callback):
+        super(AudioCompletionCallback, self).__init__()
+        self.callback = callback
+
+    @java_method('(Landroid/media/MediaPlayer;)V')
+    def onCompletion(self, mp):
+        self.callback(mp)
 
 
 # I have no idea why the others work fine as methods but this one doesnt
