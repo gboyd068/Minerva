@@ -31,6 +31,7 @@ class ServiceManagaer():
         self.start_time = None
         self.current_audio_idx = -1
         self.filenames = None
+        self.prev_status = None
 
         # settings
         self.playback_speed = 1.0
@@ -96,17 +97,21 @@ class ServiceManagaer():
         if self.playback.getDuration() != -1:
             self.playback.seekTo(int(values[0]*1000))
 
-    # how do I add this callback to the mediaplayer object
     def audio_callback(self, mp):
-        print("attempting end of file callback", self.playback.getDuration())
-        if self.playback.getDuration() != -1 and self.filenames is not None:
-            print("eof")
-            # deal with end of file
-            num_files = len(self.filenames)
-            if self.current_audio_idx < num_files-1:
-                load_audio_file(self, self.current_audio_idx+1, 0, True)
-            else:
-                print("end of playlist")
+            is_loaded = self.playback.getDuration() != -1 and self.filenames is not None
+            close_to_end = self.playback.getDuration() - self.playback.getCurrentPosition() < 1000 # prevent multiple callbacks
+            print("attempting end of file callback", self.playback.getDuration())
+            print("is_loaded", is_loaded)
+            print("close_to_end", close_to_end)
+            if  is_loaded and close_to_end:
+                was_playing = self.prev_status[2]
+                print("eof")
+                # deal with end of file
+                num_files = len(self.filenames)
+                if self.current_audio_idx < num_files-1:
+                    load_audio_file(self, self.current_audio_idx+1, 0, was_playing)
+                else:
+                    print("end of playlist")
 
 
     def status_message(self):
@@ -119,6 +124,7 @@ class ServiceManagaer():
             status = [self.current_audio_idx, current_position, self.playback.isPlaying(), self.playback.getDuration()/1000]
             print("STATUS: ", status)
             self.send_message(b'/status', status)
+            self.prev_status = status
 
 
 
