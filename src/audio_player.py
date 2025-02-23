@@ -26,6 +26,7 @@ class AudioPlayer():
         self.start_time = 0
         self.duration = None
         self.slider = None
+        self.play_button = None
         self.sync_script = None
         # threading logic
         self.audio_thread = None
@@ -69,6 +70,7 @@ class AudioPlayer():
         self.slider = app.root.player_screen.audio_slider
         self.slider.bind(value=self.on_slider_value_change)
         self.sync_script = app.root.player_screen.sync_script
+        self.play_button = app.root.player_screen.play_button
         
 
     def send_message(self, address, values):
@@ -95,6 +97,10 @@ class AudioPlayer():
                 Clock.schedule_once(self.set_slider_value)
 
             # update play/pause button
+            if self.is_audio_loaded and self.play_button is not None:
+                if self.play_button.is_playing != self.is_playing:
+                    self.play_button.is_playing = self.is_playing
+                
 
             # turn page if required
             if self.sync_script.auto_page_turn_enabled and self.is_playing:
@@ -189,9 +195,11 @@ class AudioPlayer():
 
 
     def set_slider_value(self, dt=None):
-        self.slider.value = self.current_audio_position / self.duration
-
-
+        try:
+            self.slider.value = self.current_audio_position / self.duration
+        except ZeroDivisionError as e:
+            print(e)
+            self.slider.value = 0
 
     def on_slider_value_change(self, instance, value):
         pos = self.slider.value
