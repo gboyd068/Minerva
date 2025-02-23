@@ -3,6 +3,7 @@ epub.epub
 icon_viewer.py
 politics_on_the_edge
 EoTW
+alloy
 bin
 .buildozer
 __pycache__
